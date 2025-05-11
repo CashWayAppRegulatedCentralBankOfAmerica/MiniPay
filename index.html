@@ -9,42 +9,48 @@
 </head>
 <body class="bg-gray-900 text-white font-sans antialiased">
     <div class="w-full max-w-sm mx-auto mt-4 p-4">
+        <!-- Header Section -->
         <div class="text-center mb-4">
-            <h1 class="text-2xl font-bold">👋 Welcome to MiniPay</h1>
+            <h1 class="text-2xl font-bold mb-2">👋 Welcome to MiniPay</h1>
         </div>
 
+        <!-- Main Wallet Card -->
         <div class="bg-green-600 rounded-2xl p-4 mb-4 relative">
             <div class="absolute top-2 right-2 bg-white p-2 rounded-lg shadow-md">
-                <img src="https://via.placeholder.com/60" alt="QR Code" class="w-12 h-12" />
+                <img src="https://via.placeholder.com/60" alt="QR Code" class="w-16 h-16" />
             </div>
-            <div class="mb-4">
-                <h2 class="text-sm font-semibold text-gray-200">Total Balance</h2>
-                <h2 class="text-3xl font-bold mt-1">$0.10</h2>
-            </div>
-
-            <div class="flex justify-between items-center mb-4">
-                <div class="flex items-center space-x-2">
-                    <span class="text-sm text-white">USD</span>
-                    <label class="relative inline-flex items-center cursor-pointer">
-                        <input type="checkbox" value="" class="sr-only peer">
-                        <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-2 peer-focus:ring-green-300 rounded-full peer peer-checked:bg-green-500"></div>
-                    </label>
-                    <span class="text-sm text-white">KES</span>
+            <div class="flex justify-between items-center">
+                <div>
+                    <h2 class="text-sm font-semibold text-gray-200">Total</h2>
+                    <h2 class="text-3xl font-bold mt-1">$0.10</h2>
                 </div>
             </div>
 
-            <div class="grid grid-cols-2 gap-4">
+            <!-- Currency Switcher -->
+            <div class="flex justify-between items-center mt-4">
+                <span class="text-sm text-white">USD</span>
+                <label class="relative inline-flex items-center cursor-pointer">
+                    <input type="checkbox" value="" class="sr-only peer">
+                    <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-2 peer-focus:ring-green-300 rounded-full peer peer-checked:bg-green-500"></div>
+                </label>
+                <span class="text-sm text-white">KES</span>
+            </div>
+
+            <!-- Action Buttons -->
+            <div class="grid grid-cols-2 gap-4 mt-4">
                 <button class="bg-green-700 py-2 rounded-xl text-white font-semibold">Add Cash</button>
                 <button class="bg-green-700 py-2 rounded-xl text-white font-semibold">Withdraw</button>
             </div>
         </div>
 
+        <!-- Promotion Card -->
         <div class="bg-blue-600 rounded-2xl p-4 mb-4">
             <h3 class="text-lg font-semibold mb-2">You're almost there!</h3>
             <p class="text-sm mb-3">Get up to $0.25 back on your first add cash transaction. Earn 2% weekly on your savings.</p>
             <button class="bg-blue-800 w-full py-2 rounded-xl text-white font-semibold">Add Cash</button>
         </div>
 
+        <!-- Recent Activity -->
         <div class="bg-gray-800 rounded-2xl p-4">
             <div class="flex justify-between items-center mb-2">
                 <h3 class="text-lg font-semibold">Recent activity</h3>
