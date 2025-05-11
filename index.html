@@ -5,69 +5,62 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="theme-color" content="#1a1a2e">
     <title>MiniPay Wallet</title>
-    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
 </head>
-<body class="bg-gray-900 text-white font-sans antialiased">
-    <div class="w-full max-w-sm mx-auto mt-4 p-4">
+<body class="bg-dark text-white">
+    <div class="container mt-4">
         <!-- Header Section -->
         <div class="text-center mb-4">
-            <h1 class="text-2xl font-bold mb-2">👋 Welcome to MiniPay</h1>
+            <h1 class="fw-bold">👋 Welcome to MiniPay</h1>
         </div>
 
         <!-- Main Wallet Card -->
-        <div class="bg-green-600 rounded-2xl p-4 mb-4 relative">
-            <div class="absolute top-2 right-2 bg-white p-2 rounded-lg shadow-md">
-                <img src="https://via.placeholder.com/60" alt="QR Code" class="w-16 h-16" />
-            </div>
-            <div class="flex justify-between items-center">
-                <div>
-                    <h2 class="text-sm font-semibold text-gray-200">Total</h2>
-                    <h2 class="text-3xl font-bold mt-1">$0.10</h2>
+        <div class="card bg-success text-white mb-4 position-relative">
+            <div class="card-body">
+                <img src="https://via.placeholder.com/60" alt="QR Code" class="position-absolute top-0 end-0 m-3" />
+                <h5 class="card-title">Total</h5>
+                <h2 class="fw-bold">$0.10</h2>
+                <div class="d-flex justify-content-between align-items-center my-3">
+                    <span>USD</span>
+                    <div class="form-check form-switch">
+                        <input class="form-check-input" type="checkbox" role="switch" id="currencySwitch">
+                    </div>
+                    <span>KES</span>
                 </div>
-            </div>
-
-            <!-- Currency Switcher -->
-            <div class="flex justify-between items-center mt-4">
-                <span class="text-sm text-white">USD</span>
-                <label class="relative inline-flex items-center cursor-pointer">
-                    <input type="checkbox" value="" class="sr-only peer">
-                    <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-2 peer-focus:ring-green-300 rounded-full peer peer-checked:bg-green-500"></div>
-                </label>
-                <span class="text-sm text-white">KES</span>
-            </div>
-
-            <!-- Action Buttons -->
-            <div class="grid grid-cols-2 gap-4 mt-4">
-                <button class="bg-green-700 py-2 rounded-xl text-white font-semibold">Add Cash</button>
-                <button class="bg-green-700 py-2 rounded-xl text-white font-semibold">Withdraw</button>
+                <div class="d-grid gap-2">
+                    <button class="btn btn-light text-success">Add Cash</button>
+                    <button class="btn btn-light text-success">Withdraw</button>
+                </div>
             </div>
         </div>
 
         <!-- Promotion Card -->
-        <div class="bg-blue-600 rounded-2xl p-4 mb-4">
-            <h3 class="text-lg font-semibold mb-2">You're almost there!</h3>
-            <p class="text-sm mb-3">Get up to $0.25 back on your first add cash transaction. Earn 2% weekly on your savings.</p>
-            <button class="bg-blue-800 w-full py-2 rounded-xl text-white font-semibold">Add Cash</button>
+        <div class="card bg-primary text-white mb-4">
+            <div class="card-body">
+                <h5 class="card-title">You're almost there!</h5>
+                <p class="card-text">Get up to $0.25 back on your first add cash transaction. Earn 2% weekly on your savings.</p>
+                <button class="btn btn-dark w-100">Add Cash</button>
+            </div>
         </div>
 
         <!-- Recent Activity -->
-        <div class="bg-gray-800 rounded-2xl p-4">
-            <div class="flex justify-between items-center mb-2">
-                <h3 class="text-lg font-semibold">Recent activity</h3>
-            </div>
-            <div class="space-y-4">
-                <div class="flex justify-between items-center bg-gray-700 p-4 rounded-xl mb-2">
-                    <div class="flex items-center space-x-3">
-                        <div class="bg-blue-500 p-2 rounded-full">📦</div>
+        <div class="card bg-secondary text-white">
+            <div class="card-body">
+                <h5 class="card-title">Recent Activity</h5>
+                <div class="list-group list-group-flush">
+                    <div class="list-group-item bg-secondary text-white d-flex justify-content-between">
                         <div>
-                            <h4 class="font-medium">Reward</h4>
-                            <span class="text-xs text-gray-400">8 hr ago</span>
+                            <span>📦 Reward</span>
+                            <br>
+                            <small class="text-muted">8 hr ago</small>
                         </div>
+                        <span class="text-success">+$0.01</span>
                     </div>
-                    <span class="text-green-400">+$0.01</span>
                 </div>
             </div>
         </div>
     </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
