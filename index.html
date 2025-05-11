@@ -36,51 +36,20 @@
         <div class="bg-gray-800 rounded-2xl p-4">
             <div class="flex justify-between items-center mb-2">
                 <h3 class="text-lg font-semibold">Recent activity</h3>
-                <button class="text-green-500 text-sm">View more</button>
             </div>
-            <div class="space-y-2 max-h-[500px] overflow-y-auto">
-                <template id="activity-template">
-                    <div class="flex justify-between items-center bg-gray-700 p-3 rounded-xl">
-                        <div class="flex items-center space-x-3">
-                            <div class="bg-blue-500 p-2 rounded-full">📦</div>
-                            <div>
-                                <h4 class="font-medium">Reward</h4>
-                                <span class="text-xs text-gray-400">8 hr ago</span>
-                            </div>
+            <div class="space-y-4">
+                <div class="flex justify-between items-center bg-gray-700 p-4 rounded-xl">
+                    <div class="flex items-center space-x-3">
+                        <div class="bg-blue-500 p-2 rounded-full">📦</div>
+                        <div>
+                            <h4 class="font-medium">Reward</h4>
+                            <span class="text-xs text-gray-400">8 hr ago</span>
                         </div>
-                        <span class="text-green-400">+$0.01</span>
                     </div>
-                </template>
-                <div id="activities"></div>
+                    <span class="text-green-400">+$0.01</span>
+                </div>
             </div>
         </div>
     </div>
-
-    <script>
-        const activities = [
-            { icon: "📦", label: "Reward", time: "8 hr ago", amount: "+$0.01" },
-            { icon: "🎁", label: "Reward", time: "8 hr ago", amount: "+$0.10" },
-            { icon: "📦", label: "Reward", time: "1 day ago", amount: "+$0.05" },
-            { icon: "🎁", label: "Reward", time: "2 days ago", amount: "+$0.02" },
-            { icon: "📦", label: "Reward", time: "3 days ago", amount: "+$0.15" },
-            { icon: "🎁", label: "Reward", time: "4 days ago", amount: "+$0.20" },
-            { icon: "📦", label: "Reward", time: "5 days ago", amount: "+$0.25" },
-            { icon: "🎁", label: "Reward", time: "6 days ago", amount: "+$0.30" },
-            { icon: "📦", label: "Reward", time: "1 week ago", amount: "+$0.50" },
-            { icon: "🎁", label: "Reward", time: "2 weeks ago", amount: "+$0.60" }
-        ];
-
-        const container = document.getElementById('activities');
-        const template = document.getElementById('activity-template');
-
-        activities.forEach(activity => {
-            const clone = template.content.cloneNode(true);
-            clone.querySelector('div.bg-blue-500').textContent = activity.icon;
-            clone.querySelector('h4').textContent = activity.label;
-            clone.querySelector('span.text-xs').textContent = activity.time;
-            clone.querySelector('span.text-green-400').textContent = activity.amount;
-            container.appendChild(clone);
-        });
-    </script>
 </body>
 </html>
