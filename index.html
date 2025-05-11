@@ -9,16 +9,26 @@
 </head>
 <body class="bg-gray-900 text-white font-sans antialiased">
     <div class="w-full max-w-sm mx-auto mt-4 p-4">
-        <div class="bg-green-600 rounded-2xl p-4 mb-4">
+        <div class="text-center mb-4">
+            <h1 class="text-xl font-bold">Welcome to MiniPay</h1>
+        </div>
+
+        <div class="bg-green-600 rounded-2xl p-4 mb-4 relative">
+            <div class="absolute top-2 right-2 bg-white p-2 rounded-lg">
+                <img src="https://via.placeholder.com/50" alt="QR Code" class="w-10 h-10" />
+            </div>
             <div class="flex justify-between items-center mb-2">
-                <h2 class="text-2xl font-bold">$0.10</h2>
+                <div>
+                    <h2 class="text-lg font-semibold">Total</h2>
+                    <h2 class="text-2xl font-bold">$0.10</h2>
+                </div>
                 <div class="flex items-center space-x-2">
-                    <span class="text-xs text-white">USD</span>
+                    <span class="text-sm text-white">USD</span>
                     <label class="relative inline-flex items-center cursor-pointer">
                         <input type="checkbox" value="" class="sr-only peer">
                         <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-2 peer-focus:ring-green-300 rounded-full peer peer-checked:bg-green-500"></div>
                     </label>
-                    <span class="text-xs text-white">KES</span>
+                    <span class="text-sm text-white">KES</span>
                 </div>
             </div>
             <div class="grid grid-cols-2 gap-4">
@@ -48,40 +58,6 @@
                     </div>
                     <span class="text-green-400">+$0.01</span>
                 </div>
-
-                <div class="flex justify-between items-center bg-gray-700 p-4 rounded-xl mb-2">
-                    <div class="flex items-center space-x-3">
-                        <div class="bg-green-500 p-2 rounded-full">🎁</div>
-                        <div>
-                            <h4 class="font-medium">Reward</h4>
-                            <span class="text-xs text-gray-400">8 hr ago</span>
-                        </div>
-                    </div>
-                    <span class="text-green-400">+$0.10</span>
-                </div>
-
-                <div class="flex justify-between items-center bg-gray-700 p-4 rounded-xl mb-2">
-                    <div class="flex items-center space-x-3">
-                        <div class="bg-blue-500 p-2 rounded-full">📦</div>
-                        <div>
-                            <h4 class="font-medium">Reward</h4>
-                            <span class="text-xs text-gray-400">1 day ago</span>
-                        </div>
-                    </div>
-                    <span class="text-green-400">+$0.05</span>
-                </div>
-
-                <div class="flex justify-between items-center bg-gray-700 p-4 rounded-xl mb-2">
-                    <div class="flex items-center space-x-3">
-                        <div class="bg-green-500 p-2 rounded-full">🎁</div>
-                        <div>
-                            <h4 class="font-medium">Reward</h4>
-                            <span class="text-xs text-gray-400">2 days ago</span>
-                        </div>
-                    </div>
-                    <span class="text-green-400">+$0.02</span>
-                </div>
-
             </div>
         </div>
     </div>
