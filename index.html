@@ -3,144 +3,129 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>NovaFX Trading Demo</title>
+  <meta name="theme-color" content="#1a1a2e" />
+  <title>NovaFX Wallet</title>
   <script src="https://cdn.tailwindcss.com"></script>
-  <style>
-    body {
-      font-family: 'Inter', sans-serif;
-    }
-    .scrollable-table {
-      max-height: 200px;
-      overflow-y: auto;
-    }
-  </style>
 </head>
-<body class="bg-[#f8f9fb] text-gray-800">
-  <!-- NovaFX Header -->
-  <header class="bg-white shadow p-4 mb-4 rounded-b-2xl">
-    <div class="text-xl font-semibold text-center text-[#0f172a]">NovaFX Demo Trading Platform</div>
-  </header>
+<body class="bg-[#1a1a2e] text-white font-sans antialiased">
+  <div class="w-full max-w-sm mx-auto mt-4 p-4 space-y-4">
 
-  <!-- Account Overview -->
-  <div class="bg-white rounded-2xl shadow-md p-4 mb-6 grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
-    <div><strong>Balance:</strong> $<span id="balance">10000</span></div>
-    <div><strong>Equity:</strong> $<span id="equity">10000</span></div>
-    <div><strong>Free Margin:</strong> $<span id="margin">10000</span></div>
-    <div><strong>P/L:</strong> $<span id="pl">0</span></div>
-  </div>
-
-  <!-- TradingView Chart -->
-  <div class="mb-6 rounded-2xl overflow-hidden shadow">
-    <iframe src="https://s.tradingview.com/widgetembed/?frameElementId=tradingview_7c28c&symbol=FX:EURUSD&interval=1&hidesidetoolbar=1&symboledit=1&saveimage=1&toolbarbg=f1f3f6&studies=[]&theme=light&style=1&timezone=Etc/UTC&withdateranges=1&hideideas=1&studies_overrides={}&overrides={}" width="100%" height="400" frameborder="0"></iframe>
-  </div>
-
-  <!-- Trade Controls -->
-  <div class="bg-white rounded-2xl shadow-md p-4 mb-6 flex flex-col md:flex-row gap-4 items-center justify-between">
-    <div class="flex items-center gap-2">
-      <label for="lot" class="text-sm font-medium">Lot Size:</label>
-      <input id="lot" type="number" class="border border-gray-300 rounded-lg px-3 py-2 w-24" value="1" min="0.01" step="0.01" />
+    <!-- Balance Section -->
+    <div class="bg-green-600 rounded-2xl p-4">
+      <div class="flex justify-between items-center mb-2">
+        <h2 class="text-2xl font-bold">$<span id="balance">10000.00</span></h2>
+        <span class="text-xs">USD Account</span>
+      </div>
+      <div class="text-sm text-white space-y-1 mb-3">
+        <p>Equity: $<span id="equity">10000</span></p>
+        <p>Free Margin: $<span id="margin">10000</span></p>
+        <p>Used Margin: $0</p>
+        <p>P&L: <span id="pl" class="text-green-300">+0.00</span></p>
+      </div>
+      <div class="grid grid-cols-2 gap-4">
+        <button class="bg-green-700 py-2 rounded-xl font-semibold">Deposit</button>
+        <button class="bg-green-700 py-2 rounded-xl font-semibold">Withdraw</button>
+      </div>
     </div>
-    <div class="flex gap-3">
-      <button onclick="openTrade('buy')" class="bg-[#10b981] text-white px-6 py-2 rounded-xl shadow hover:bg-[#059669] transition">Buy</button>
-      <button onclick="openTrade('sell')" class="bg-[#ef4444] text-white px-6 py-2 rounded-xl shadow hover:bg-[#dc2626] transition">Sell</button>
+
+    <!-- Market Ticker -->
+    <div class="bg-gray-900 rounded-2xl p-4">
+      <h3 class="text-lg font-semibold mb-2">Forex Market</h3>
+      <div class="space-y-2 text-sm">
+        <div class="flex justify-between"><span>EUR/USD</span><span id="eurusd">1.0850</span></div>
+        <div class="flex justify-between"><span>GBP/USD</span><span>1.2754</span></div>
+        <div class="flex justify-between"><span>USD/JPY</span><span>156.24</span></div>
+        <div class="flex justify-between"><span>USD/KES</span><span>139.10</span></div>
+      </div>
     </div>
+
+    <!-- TradingView Chart -->
+    <div class="bg-blue-600 rounded-2xl p-4">
+      <h3 class="text-lg font-semibold mb-2">Price Chart</h3>
+      <div class="bg-blue-800 rounded-xl h-40 overflow-hidden">
+        <iframe class="w-full h-full rounded-xl" src="https://s.tradingview.com/widgetembed/?frameElementId=tradingview_7c28c&symbol=FX:EURUSD&interval=1&hidesidetoolbar=1&symboledit=1&saveimage=1&toolbarbg=f1f3f6&studies=[]&theme=dark&style=1&timezone=Etc/UTC&withdateranges=1&hideideas=1&studies_overrides={}&overrides={}" frameborder="0"></iframe>
+      </div>
+    </div>
+
+    <!-- Open Trade Form -->
+    <div class="bg-gray-900 rounded-2xl p-4">
+      <h3 class="text-lg font-semibold mb-2">Open Trade</h3>
+      <form class="space-y-2 text-sm">
+        <select id="symbol" class="w-full p-2 rounded-lg bg-gray-700 text-white">
+          <option value="EUR/USD">EUR/USD</option>
+        </select>
+        <input id="lot" type="number" placeholder="Lot Size" class="w-full p-2 rounded-lg bg-gray-700 text-white" value="1" min="0.01" step="0.01" />
+        <div class="grid grid-cols-2 gap-2">
+          <button type="button" onclick="openTrade('buy')" class="bg-green-600 py-2 rounded-xl font-semibold">Buy</button>
+          <button type="button" onclick="openTrade('sell')" class="bg-red-600 py-2 rounded-xl font-semibold">Sell</button>
+        </div>
+      </form>
+    </div>
+
+    <!-- Open Trades Section -->
+    <div class="bg-gray-800 rounded-2xl p-4">
+      <h3 class="text-lg font-semibold mb-2">Open Trades</h3>
+      <div class="space-y-2 text-sm" id="openTrades"></div>
+    </div>
+
+    <!-- Trade History Section -->
+    <div class="bg-gray-800 rounded-2xl p-4">
+      <div class="flex justify-between items-center mb-2">
+        <h3 class="text-lg font-semibold">Trade History</h3>
+      </div>
+      <div class="space-y-4 text-sm" id="tradeHistory"></div>
+    </div>
+
   </div>
 
-  <!-- Open Trades -->
-  <div class="bg-white rounded-2xl shadow-md p-4 mb-6">
-    <h2 class="text-lg font-semibold text-[#0f172a] mb-3">Open Trades</h2>
-    <div class="scrollable-table">
-      <table class="w-full text-sm text-left">
-        <thead class="text-gray-500 border-b">
-          <tr>
-            <th>Type</th>
-            <th>Lot</th>
-            <th>Entry</th>
-            <th>Current</th>
-            <th>P/L</th>
-            <th>Action</th>
-          </tr>
-        </thead>
-        <tbody id="openTrades"></tbody>
-      </table>
-    </div>
-  </div>
-
-  <!-- Trade History -->
-  <div class="bg-white rounded-2xl shadow-md p-4 mb-10">
-    <h2 class="text-lg font-semibold text-[#0f172a] mb-3">Trade History</h2>
-    <div class="scrollable-table">
-      <table class="w-full text-sm text-left">
-        <thead class="text-gray-500 border-b">
-          <tr>
-            <th>Type</th>
-            <th>Lot</th>
-            <th>Entry</th>
-            <th>Exit</th>
-            <th>P/L</th>
-          </tr>
-        </thead>
-        <tbody id="tradeHistory"></tbody>
-      </table>
-    </div>
-  </div>
-
-  <!-- JavaScript -->
   <script>
     let balance = 10000;
     let trades = [];
     let currentPrice = 1.0850;
 
     function updateUI() {
-      const openTrades = document.getElementById("openTrades");
-      const tradeHistory = document.getElementById("tradeHistory");
-      openTrades.innerHTML = "";
+      document.getElementById("eurusd").textContent = currentPrice.toFixed(5);
       let pl = 0;
-
+      let openHTML = "";
       trades.filter(t => !t.closed).forEach((trade, i) => {
         const diff = (currentPrice - trade.entry) * (trade.type === 'buy' ? 1 : -1);
         const profit = diff * trade.lot * 100000;
         pl += profit;
-        trade.currentPrice = currentPrice;
         trade.profit = profit;
-
-        openTrades.innerHTML += `
-          <tr>
-            <td>${trade.type}</td>
-            <td>${trade.lot}</td>
-            <td>${trade.entry.toFixed(5)}</td>
-            <td>${currentPrice.toFixed(5)}</td>
-            <td class="${profit >= 0 ? 'text-green-600' : 'text-red-600'}">${profit.toFixed(2)}</td>
-            <td><button onclick="closeTrade(${i})" class="text-blue-600 underline">Close</button></td>
-          </tr>
-        `;
+        openHTML += `
+          <div class='bg-gray-700 p-3 rounded-xl flex justify-between items-center'>
+            <div>
+              <p>${trade.symbol} - ${trade.type.toUpperCase()}</p>
+              <p class='text-xs text-gray-400'>Lot: ${trade.lot} | P&L: <span class='${profit >= 0 ? 'text-green-400' : 'text-red-400'}'>${profit.toFixed(2)}</span></p>
+            </div>
+            <button onclick='closeTrade(${i})' class='bg-red-500 text-white text-xs px-2 py-1 rounded'>Close</button>
+          </div>`;
       });
+      document.getElementById("openTrades").innerHTML = openHTML;
+      document.getElementById("pl").textContent = (pl >= 0 ? '+' : '') + pl.toFixed(2);
+      document.getElementById("equity").textContent = (balance + pl).toFixed(2);
+      document.getElementById("margin").textContent = (balance + pl).toFixed(2);
 
-      document.getElementById("pl").innerText = pl.toFixed(2);
-      document.getElementById("equity").innerText = (balance + pl).toFixed(2);
-      document.getElementById("margin").innerText = (balance + pl).toFixed(2);
-      document.getElementById("balance").innerText = balance.toFixed(2);
-
-      // History
       const closed = trades.filter(t => t.closed);
-      tradeHistory.innerHTML = "";
+      let histHTML = "";
       closed.forEach(trade => {
-        tradeHistory.innerHTML += `
-          <tr>
-            <td>${trade.type}</td>
-            <td>${trade.lot}</td>
-            <td>${trade.entry.toFixed(5)}</td>
-            <td>${trade.exit.toFixed(5)}</td>
-            <td class="${trade.profit >= 0 ? 'text-green-600' : 'text-red-600'}">${trade.profit.toFixed(2)}</td>
-          </tr>
-        `;
+        histHTML += `
+          <div class='flex justify-between items-center bg-gray-700 p-4 rounded-xl'>
+            <div>
+              <h4 class='font-medium'>${trade.symbol} - ${trade.type.toUpperCase()}</h4>
+              <span class='text-xs text-gray-400'>Just now</span>
+            </div>
+            <span class='${trade.profit >= 0 ? 'text-green-400' : 'text-red-400'}'>${trade.profit.toFixed(2)}</span>
+          </div>`;
       });
+      document.getElementById("tradeHistory").innerHTML = histHTML;
     }
 
     function openTrade(type) {
       const lot = parseFloat(document.getElementById("lot").value);
+      const symbol = document.getElementById("symbol").value;
       if (isNaN(lot) || lot <= 0) return alert("Invalid lot size");
-      trades.push({ type, lot, entry: currentPrice, closed: false });
+      trades.push({ type, lot, symbol, entry: currentPrice, closed: false });
       updateUI();
     }
 
