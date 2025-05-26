@@ -4,221 +4,217 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <meta name="theme-color" content="#1a1a2e" />
-  <title>NovaFX Wallet</title>
+  <title>Forex Wallet Platform</title>
   <script src="https://cdn.tailwindcss.com"></script>
 </head>
 <body class="bg-[#1a1a2e] text-white font-sans antialiased">
   <div class="w-full max-w-sm mx-auto mt-4 p-4 space-y-4">
 
-    <!-- Balance Section -->
+    <!-- Wallet Section -->
     <div class="bg-green-600 rounded-2xl p-4">
       <div class="flex justify-between items-center mb-2">
-        <h2 class="text-2xl font-bold">$1000.00</h2>
-        <span class="text-xs">USD Account</span>
-      </div>
-      <div class="text-sm text-white space-y-1 mb-3">
-        <p>Equity: $1000</p>
-        <p>Free Margin: $900</p>
-        <p>Used Margin: $100</p>
-        <p>P&L: <span class="text-green-300">+$15.00</span></p>
+        <h2 id="balance" class="text-2xl font-bold">$1000.00</h2>
+        <div class="flex items-center space-x-2">
+          <span class="text-xs text-white">USD</span>
+          <label class="relative inline-flex items-center cursor-pointer">
+            <input type="checkbox" value="" class="sr-only peer">
+            <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-2 peer-focus:ring-green-300 rounded-full peer peer-checked:bg-green-500"></div>
+          </label>
+          <span class="text-xs text-white">KES</span>
+        </div>
       </div>
       <div class="grid grid-cols-2 gap-4">
-        <button class="bg-green-700 py-2 rounded-xl font-semibold">Deposit</button>
-        <button class="bg-green-700 py-2 rounded-xl font-semibold">Withdraw</button>
+        <button class="bg-green-700 py-2 rounded-xl text-white font-semibold">Add Cash</button>
+        <button class="bg-green-700 py-2 rounded-xl text-white font-semibold">Withdraw</button>
       </div>
     </div>
 
-    <!-- Market Ticker -->
-    <div class="bg-gray-900 rounded-2xl p-4">
-      <h3 class="text-lg font-semibold mb-2">Forex Market</h3>
-      <div class="space-y-2 text-sm">
-        <div class="flex justify-between"><span>EUR/USD</span><span>1.0852</span></div>
-        <div class="flex justify-between"><span>GBP/USD</span><span>1.2754</span></div>
-        <div class="flex justify-between"><span>USD/JPY</span><span>156.24</span></div>
-        <div class="flex justify-between"><span>USD/KES</span><span>139.10</span></div>
-      </div>
-    </div>
-
-    <!-- Chart Placeholder -->
+    <!-- Offer -->
     <div class="bg-blue-600 rounded-2xl p-4">
-      <h3 class="text-lg font-semibold mb-2">Price Chart</h3>
-      <div class="bg-blue-800 rounded-xl h-40 flex items-center justify-center text-white text-sm">
-        (Chart coming soon)
+      <h3 class="text-lg font-semibold mb-2">You're almost there!</h3>
+      <p class="text-sm mb-3">Get up to $0.25 back on your first add cash transaction. Earn 2% weekly on your savings.</p>
+      <button class="bg-blue-800 w-full py-2 rounded-xl text-white font-semibold">Add Cash</button>
+    </div>
+
+    <!-- Trade Controls -->
+    <div class="bg-gray-800 rounded-2xl p-4 space-y-2">
+      <h3 class="text-lg font-semibold">Trade Forex</h3>
+      <select class="w-full bg-gray-700 text-white p-2 rounded-xl">
+        <option>EUR/USD</option>
+        <option>GBP/USD</option>
+        <option>USD/JPY</option>
+        <option>USD/KES</option>
+      </select>
+      <input type="number" placeholder="Lot size (e.g. 0.1)" class="w-full bg-gray-700 p-2 rounded-xl text-white">
+      <div class="flex gap-4 mt-2">
+        <button class="bg-green-600 flex-1 py-2 rounded-xl text-white font-semibold">Buy</button>
+        <button class="bg-red-600 flex-1 py-2 rounded-xl text-white font-semibold">Sell</button>
       </div>
     </div>
 
-    <!-- Open Trade Form -->
-    <div class="bg-gray-900 rounded-2xl p-4">
-      <h3 class="text-lg font-semibold mb-2">Open Trade</h3>
-      <form class="space-y-2 text-sm">
-        <select class="w-full p-2 rounded-lg bg-gray-700 text-white">
-          <option>EUR/USD</option>
-          <option>GBP/USD</option>
-          <option>USD/JPY</option>
-        </select>
-        <input type="number" placeholder="Lot Size" class="w-full p-2 rounded-lg bg-gray-700 text-white" />
-        <div class="grid grid-cols-2 gap-2">
-          <button type="button" class="bg-green-600 py-2 rounded-xl font-semibold">Buy</button>
-          <button type="button" class="bg-red-600 py-2 rounded-xl font-semibold">Sell</button>
-        </div>
-      </form>
-    </div>
-
-    <!-- Open Trades Section -->
+    <!-- Market Prices -->
     <div class="bg-gray-800 rounded-2xl p-4">
-      <h3 class="text-lg font-semibold mb-2">Open Trades</h3>
+      <h3 class="text-lg font-semibold mb-2">Live Market Prices</h3>
       <div class="space-y-2 text-sm">
-        <div class="bg-gray-700 p-3 rounded-xl flex justify-between items-center">
-          <div>
-            <p>EUR/USD - Buy</p>
-            <p class="text-xs text-gray-400">Lot: 0.1 | P&L: <span class="text-green-400">+2.50</span></p>
-          </div>
-          <button class="bg-red-500 text-white text-xs px-2 py-1 rounded">Close</button>
-        </div>
+        <div class="flex justify-between"><span>EUR/USD</span><span data-market="EUR/USD">--</span></div>
+        <div class="flex justify-between"><span>GBP/USD</span><span data-market="GBP/USD">--</span></div>
+        <div class="flex justify-between"><span>USD/JPY</span><span data-market="USD/JPY">--</span></div>
+        <div class="flex justify-between"><span>USD/KES</span><span data-market="USD/KES">--</span></div>
       </div>
     </div>
 
-    <!-- Trade History Section -->
+    <!-- Account Info -->
+    <div class="bg-gray-800 rounded-2xl p-4 space-y-1 text-sm">
+      <h3 class="text-lg font-semibold mb-2">Account Summary</h3>
+      <p id="equity">Equity: $1000.00</p>
+      <p id="used-margin">Used Margin: $100.00</p>
+      <p id="free-margin">Free Margin: $900.00</p>
+      <p id="pnl">P&L: <span class="text-green-300">0.00</span></p>
+    </div>
+
+    <!-- Open Trades -->
     <div class="bg-gray-800 rounded-2xl p-4">
       <div class="flex justify-between items-center mb-2">
-        <h3 class="text-lg font-semibold">Trade History</h3>
+        <h3 class="text-lg font-semibold">Open Trades</h3>
       </div>
-      <div class="space-y-4 text-sm">
-        <div class="flex justify-between items-center bg-gray-700 p-4 rounded-xl">
-          <div>
-            <h4 class="font-medium">EUR/USD - Buy</h4>
-            <span class="text-xs text-gray-400">1 day ago</span>
-          </div>
-          <span class="text-green-400">+$5.00</span>
-        </div>
-        <div class="flex justify-between items-center bg-gray-700 p-4 rounded-xl">
-          <div>
-            <h4 class="font-medium">GBP/USD - Sell</h4>
-            <span class="text-xs text-gray-400">2 days ago</span>
-          </div>
-          <span class="text-red-400">-2.00</span>
-        </div>
+      <div id="open-trades" class="space-y-2 text-sm">
+        <!-- Dynamic trades appear here -->
       </div>
     </div>
 
+    <!-- Activity Log -->
+    <div class="bg-gray-800 rounded-2xl p-4">
+      <div class="flex justify-between items-center mb-2">
+        <h3 class="text-lg font-semibold">Recent activity</h3>
+      </div>
+      <div class="space-y-4">
+        <div class="flex justify-between items-center bg-gray-700 p-4 rounded-xl mb-2">
+          <div class="flex items-center space-x-3">
+            <div class="bg-blue-500 p-2 rounded-full">📦</div>
+            <div><h4 class="font-medium">Reward</h4><span class="text-xs text-gray-400">8 hr ago</span></div>
+          </div>
+          <span class="text-green-400">+$0.01</span>
+        </div>
+        <!-- Add more rewards if needed -->
+      </div>
+    </div>
   </div>
 
-  <!-- Add this script to make the platform live -->
-<script>
-const pairs = ["EUR/USD", "GBP/USD", "USD/JPY", "USD/KES"];
-const prices = {};
-const trades = [];
-let balance = 1000;
-let usedMargin = 100;
-let pnl = 0;
+  <!-- DYNAMIC SCRIPT -->
+  <script>
+    const pairs = ["EUR/USD", "GBP/USD", "USD/JPY", "USD/KES"];
+    const prices = {};
+    const trades = [];
+    let balance = 1000;
+    let usedMargin = 100;
+    let pnl = 0;
 
-function formatNum(num) {
-  return parseFloat(num).toFixed(4);
-}
-
-async function fetchPrices() {
-  const symbols = {
-    "EUR/USD": "EUR/USD",
-    "GBP/USD": "GBP/USD",
-    "USD/JPY": "USD/JPY",
-    "USD/KES": "USD/KES"
-  };
-
-  const apiKey = "fa443b33e32c49e1b03c0be6d9699b1c";
-  for (const pair in symbols) {
-    const url = `https://api.twelvedata.com/price?symbol=${symbols[pair]}&apikey=${apiKey}`;
-    const res = await fetch(url);
-    const data = await res.json();
-    prices[pair] = parseFloat(data.price);
-  }
-  updatePrices();
-  updateTrades();
-  updateAccount();
-}
-
-function updatePrices() {
-  const marketList = document.querySelectorAll("[data-market]");
-  marketList.forEach(el => {
-    const pair = el.getAttribute("data-market");
-    if (prices[pair]) {
-      el.textContent = formatNum(prices[pair]);
+    function formatNum(num) {
+      return parseFloat(num).toFixed(4);
     }
-  });
-}
 
-function updateTrades() {
-  let openTradeList = document.querySelector("#open-trades");
-  openTradeList.innerHTML = "";
-  pnl = 0;
+    async function fetchPrices() {
+      const symbols = {
+        "EUR/USD": "EUR/USD",
+        "GBP/USD": "GBP/USD",
+        "USD/JPY": "USD/JPY",
+        "USD/KES": "USD/KES"
+      };
+      const apiKey = "fa443b33e32c49e1b03c0be6d9699b1c";
 
-  trades.forEach((trade, index) => {
-    const currentPrice = prices[trade.pair];
-    if (!currentPrice) return;
+      for (const pair in symbols) {
+        const url = `https://api.twelvedata.com/price?symbol=${symbols[pair]}&apikey=${apiKey}`;
+        const res = await fetch(url);
+        const data = await res.json();
+        prices[pair] = parseFloat(data.price);
+      }
 
-    const movement = trade.type === "Buy"
-      ? (currentPrice - trade.entry)
-      : (trade.entry - currentPrice);
+      updatePrices();
+      updateTrades();
+      updateAccount();
+    }
 
-    const tradePnl = movement * 100000 * trade.lotSize;
-    pnl += tradePnl;
+    function updatePrices() {
+      document.querySelectorAll("[data-market]").forEach(el => {
+        const pair = el.getAttribute("data-market");
+        if (prices[pair]) el.textContent = formatNum(prices[pair]);
+      });
+    }
 
-    const item = document.createElement("div");
-    item.className = "bg-gray-700 p-3 rounded-xl flex justify-between items-center text-sm";
-    item.innerHTML = `
-      <div>
-        <p>${trade.pair} - ${trade.type}</p>
-        <p class="text-xs text-gray-400">Lot: ${trade.lotSize} | P&L: <span class="${tradePnl >= 0 ? 'text-green-400' : 'text-red-400'}">${tradePnl.toFixed(2)}</span></p>
-      </div>
-      <button onclick="closeTrade(${index})" class="bg-red-500 text-white text-xs px-2 py-1 rounded">Close</button>
-    `;
-    openTradeList.appendChild(item);
-  });
-}
+    function updateTrades() {
+      let openTradeList = document.querySelector("#open-trades");
+      openTradeList.innerHTML = "";
+      pnl = 0;
 
-function updateAccount() {
-  const equity = balance + pnl;
-  const freeMargin = equity - usedMargin;
+      trades.forEach((trade, index) => {
+        const currentPrice = prices[trade.pair];
+        if (!currentPrice) return;
 
-  document.querySelector("#balance").textContent = "$" + balance.toFixed(2);
-  document.querySelector("#equity").textContent = "Equity: $" + equity.toFixed(2);
-  document.querySelector("#free-margin").textContent = "Free Margin: $" + freeMargin.toFixed(2);
-  document.querySelector("#used-margin").textContent = "Used Margin: $" + usedMargin.toFixed(2);
-  document.querySelector("#pnl").innerHTML = "P&L: <span class='" + (pnl >= 0 ? "text-green-300" : "text-red-300") + "'>" + pnl.toFixed(2) + "</span>";
-}
+        const movement = trade.type === "Buy"
+          ? (currentPrice - trade.entry)
+          : (trade.entry - currentPrice);
 
-function openTrade(type) {
-  const pair = document.querySelector("select").value;
-  const lotSize = parseFloat(document.querySelector("input[type='number']").value) || 0.1;
-  const entry = prices[pair] || 0;
+        const tradePnl = movement * 100000 * trade.lotSize;
+        pnl += tradePnl;
 
-  if (!entry) return alert("Price not loaded yet.");
+        const item = document.createElement("div");
+        item.className = "bg-gray-700 p-3 rounded-xl flex justify-between items-center text-sm";
+        item.innerHTML = `
+          <div>
+            <p>${trade.pair} - ${trade.type}</p>
+            <p class="text-xs text-gray-400">Lot: ${trade.lotSize} | P&L: <span class="${tradePnl >= 0 ? 'text-green-400' : 'text-red-400'}">${tradePnl.toFixed(2)}</span></p>
+          </div>
+          <button onclick="closeTrade(${index})" class="bg-red-500 text-white text-xs px-2 py-1 rounded">Close</button>
+        `;
+        openTradeList.appendChild(item);
+      });
+    }
 
-  trades.push({ pair, type, lotSize, entry });
-  usedMargin += 50;
-  updateTrades();
-  updateAccount();
-}
+    function updateAccount() {
+      const equity = balance + pnl;
+      const freeMargin = equity - usedMargin;
 
-function closeTrade(index) {
-  trades.splice(index, 1);
-  usedMargin -= 50;
-  updateTrades();
-  updateAccount();
-}
+      document.querySelector("#balance").textContent = "$" + balance.toFixed(2);
+      document.querySelector("#equity").textContent = "Equity: $" + equity.toFixed(2);
+      document.querySelector("#free-margin").textContent = "Free Margin: $" + freeMargin.toFixed(2);
+      document.querySelector("#used-margin").textContent = "Used Margin: $" + usedMargin.toFixed(2);
+      document.querySelector("#pnl").innerHTML = "P&L: <span class='" + (pnl >= 0 ? "text-green-300" : "text-red-300") + "'>" + pnl.toFixed(2) + "</span>";
+    }
 
-document.querySelector(".bg-green-600 button:nth-child(1)").addEventListener("click", () => {
-  balance += 100;
-  updateAccount();
-});
+    function openTrade(type) {
+      const pair = document.querySelector("select").value;
+      const lotSize = parseFloat(document.querySelector("input[type='number']").value) || 0.1;
+      const entry = prices[pair] || 0;
 
-document.querySelector(".bg-green-600 button:nth-child(2)").addEventListener("click", () => {
-  balance -= 100;
-  updateAccount();
-});
+      if (!entry) return alert("Price not loaded yet.");
+      trades.push({ pair, type, lotSize, entry });
+      usedMargin += 50;
+      updateTrades();
+      updateAccount();
+    }
 
-setInterval(fetchPrices, 5000);
-fetchPrices();
-</script>
+    function closeTrade(index) {
+      trades.splice(index, 1);
+      usedMargin -= 50;
+      updateTrades();
+      updateAccount();
+    }
 
+    document.querySelector(".bg-green-600 button:nth-child(1)").addEventListener("click", () => {
+      balance += 100;
+      updateAccount();
+    });
+
+    document.querySelector(".bg-green-600 button:nth-child(2)").addEventListener("click", () => {
+      balance -= 100;
+      updateAccount();
+    });
+
+    document.querySelector(".bg-green-600 ~ .bg-blue-600 + .bg-gray-800 button.bg-green-600").addEventListener("click", () => openTrade("Buy"));
+    document.querySelector(".bg-green-600 ~ .bg-blue-600 + .bg-gray-800 button.bg-red-600").addEventListener("click", () => openTrade("Sell"));
+
+    setInterval(fetchPrices, 5000);
+    fetchPrices();
+  </script>
 </body>
 </html>
