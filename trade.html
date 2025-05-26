@@ -3,133 +3,100 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>NovaFX Dashboard</title>
+  <meta name="theme-color" content="#1a1a2e" />
+  <title>NovaFX Trading</title>
   <script src="https://cdn.tailwindcss.com"></script>
-  <style>
-    @media (min-width: 768px) {
-      .responsive-container {
-        max-width: 768px;
-        margin: 0 auto;
-      }
-    }
-  </style>
+  <script src="https://unpkg.com/lightweight-charts@3.7.0/dist/lightweight-charts.standalone.production.js"></script>
 </head>
 <body class="bg-[#1a1a2e] text-white font-sans antialiased">
-  <div class="w-full px-2 responsive-container mt-4 space-y-4">
-    <!-- Balance Section -->
-    <div class="bg-green-600 rounded-2xl p-4">
-      <div class="flex justify-between items-center mb-2">
-        <h2 class="text-2xl font-bold" id="balance">$1000.00</h2>
-        <span class="text-xs">USD Account</span>
+  <div class="w-full px-2 max-w-3xl mx-auto mt-4 space-y-4">
+    <div class="bg-gray-900 rounded-2xl p-4">
+      <div class="flex justify-between items-center mb-3">
+        <h2 class="text-xl font-bold">Trade Forex</h2>
+        <a href="dashboard.html" class="text-sm text-blue-400 underline">Go to Dashboard</a>
       </div>
-      <div class="text-sm text-white space-y-1 mb-3">
-        <p>Equity: $<span id="equity">1000.00</span></p>
-        <p>Free Margin: $<span id="free-margin">1000.00</span></p>
-        <p>Used Margin: $<span id="used-margin">0.00</span></p>
-        <p>P&L: <span class="text-green-300" id="pnl">$0.00</span></p>
+      <select id="pair-select" class="w-full p-2 rounded-lg bg-gray-700 text-white"></select>
+      <div class="grid grid-cols-3 gap-2 mt-2">
+        <input type="number" id="lot-size" placeholder="Lot Size (e.g. 0.01)" step="0.01" min="0.01" class="p-2 rounded-lg bg-gray-700 text-white" />
+        <input type="number" id="stop-loss" placeholder="Stop Loss" class="p-2 rounded-lg bg-gray-700 text-white" />
+        <input type="number" id="take-profit" placeholder="Take Profit" class="p-2 rounded-lg bg-gray-700 text-white" />
       </div>
-      <div class="grid grid-cols-2 gap-4">
-        <a href="trading.html" class="bg-green-700 py-2 rounded-xl font-semibold text-center block">Trade</a>
-        <a href="history.html" class="bg-green-700 py-2 rounded-xl font-semibold text-center block">History</a>
+      <div class="grid grid-cols-2 gap-2 mt-3">
+        <button onclick="openTrade('buy')" class="bg-green-600 py-2 rounded-xl font-semibold">Buy</button>
+        <button onclick="openTrade('sell')" class="bg-red-600 py-2 rounded-xl font-semibold">Sell</button>
       </div>
     </div>
 
-    <!-- Open Trades Section -->
-    <div class="bg-gray-800 rounded-2xl p-4">
-      <div class="flex justify-between items-center mb-2">
-        <h3 class="text-lg font-semibold">Open Trades</h3>
-        <button onclick="closeAllTrades()" class="text-xs bg-red-500 px-2 py-1 rounded">Close All</button>
-      </div>
-      <div class="space-y-2 text-sm" id="open-trades"></div>
+    <div class="bg-blue-600 rounded-2xl p-4">
+      <h3 class="text-lg font-semibold mb-2">Live Chart</h3>
+      <div class="bg-blue-800 rounded-xl h-64" id="chart"></div>
     </div>
   </div>
 
   <script>
-    const balanceEl = document.getElementById("balance");
-    const equityEl = document.getElementById("equity");
-    const freeMarginEl = document.getElementById("free-margin");
-    const usedMarginEl = document.getElementById("used-margin");
-    const pnlEl = document.getElementById("pnl");
-    const openTradesEl = document.getElementById("open-trades");
+    const pairSelect = document.getElementById("pair-select");
+    const pairs = [
+      "EUR/USD", "GBP/USD", "USD/JPY", "USD/KES", "AUD/USD",
+      "USD/CHF", "NZD/USD", "EUR/JPY", "GBP/JPY", "USD/CAD", "XAU/USD"
+    ];
 
-    let account = JSON.parse(localStorage.getItem("account")) || {
-      balance: 1000,
-      equity: 1000,
-      usedMargin: 0,
-      pnl: 0,
-      trades: [],
-      history: [],
-    };
+    function renderPairs() {
+      pairSelect.innerHTML = pairs.map(p => `<option value="${p}">${p}</option>`).join("");
+    }
 
-    const market = JSON.parse(localStorage.getItem("market")) || {};
+    function fetchLivePrice(pair) {
+      // Simulate TradingView fetch (replace with real API integration)
+      const base = 1.0 + Math.random();
+      const price = parseFloat((base + (Math.random() - 0.5) * 0.01).toFixed(5));
+      return price;
+    }
 
-    function updateTrades() {
-      let totalPnl = 0;
-      openTradesEl.innerHTML = "";
-      account.trades.forEach((t, i) => {
-        const price = market[t.pair];
-        if (!price) return;
-        let diff = (t.type === 'buy') ? price - t.openPrice : t.openPrice - price;
-        const pnl = diff * 100 * t.lot;
-        totalPnl += pnl;
-        const isTP = t.tp && ((t.type === 'buy' && price >= t.tp) || (t.type === 'sell' && price <= t.tp));
-        const isSL = t.sl && ((t.type === 'buy' && price <= t.sl) || (t.type === 'sell' && price >= t.sl));
-        if (isTP || isSL) return closeTrade(i, pnl);
-        openTradesEl.innerHTML += `
-          <div class="bg-gray-700 p-3 rounded-xl flex justify-between items-center">
-            <div>
-              <p>${t.pair} - ${t.type}</p>
-              <p class="text-xs text-gray-400">Lot: ${t.lot} | P&L: <span class="${pnl >= 0 ? 'text-green-400' : 'text-red-400'}">${pnl.toFixed(2)}</span></p>
-            </div>
-            <button onclick="closeTrade(${i}, ${pnl})" class="bg-red-500 text-white text-xs px-2 py-1 rounded">Close</button>
-          </div>`;
-      });
-      account.pnl = totalPnl;
-      account.equity = account.balance + totalPnl;
-      account.freeMargin = account.equity - account.usedMargin;
-      if (account.equity <= 0) {
-        alert("Account blown!");
-        account = {balance: 1000, equity: 1000, usedMargin: 0, pnl: 0, trades: [], history: []};
+    function updateChart(pair) {
+      const prices = Array.from({length: 30}, (_, i) => ({
+        time: (Date.now() / 1000 | 0) - i * 60,
+        value: fetchLivePrice(pair)
+      })).reverse();
+      chartSeries.setData(prices);
+    }
+
+    function openTrade(type) {
+      const pair = pairSelect.value;
+      const lot = parseFloat(document.getElementById("lot-size").value);
+      const sl = parseFloat(document.getElementById("stop-loss").value);
+      const tp = parseFloat(document.getElementById("take-profit").value);
+      const price = fetchLivePrice(pair);
+
+      if (!lot || lot < 0.01) return alert("Lot size too small");
+      if (isNaN(sl) || isNaN(tp)) return alert("SL and TP required");
+      if ((type === 'buy' && (sl >= price || tp <= price)) || (type === 'sell' && (sl <= price || tp >= price))) {
+        return alert("Invalid SL or TP");
       }
-      renderStats();
-    }
 
-    function closeTrade(i, pnl) {
-      const t = account.trades[i];
-      account.balance += pnl;
-      account.usedMargin -= t.lot * 100;
-      account.history.push({...t, pnl, closed: Date.now()});
-      account.trades.splice(i, 1);
-      save();
-    }
+      const acc = JSON.parse(localStorage.getItem("account")) || {
+        balance: 1000, equity: 1000, usedMargin: 0, pnl: 0, trades: [], history: []
+      };
 
-    function closeAllTrades() {
-      while (account.trades.length > 0) {
-        const pnl = 0;
-        closeTrade(0, pnl);
+      if (acc.freeMargin !== undefined && acc.freeMargin < lot * 100) {
+        alert("Insufficient margin.");
+        return;
       }
-      save();
+
+      acc.usedMargin += lot * 100;
+      acc.trades.push({pair, lot, type, openPrice: price, sl, tp});
+      localStorage.setItem("account", JSON.stringify(acc));
+      alert("Trade opened successfully!");
     }
 
-    function renderStats() {
-      balanceEl.innerText = "$" + account.balance.toFixed(2);
-      equityEl.innerText = account.equity.toFixed(2);
-      usedMarginEl.innerText = account.usedMargin.toFixed(2);
-      freeMarginEl.innerText = account.freeMargin.toFixed(2);
-      pnlEl.innerText = "$" + account.pnl.toFixed(2);
-    }
+    renderPairs();
+    pairSelect.addEventListener('change', () => updateChart(pairSelect.value));
 
-    function save() {
-      localStorage.setItem("account", JSON.stringify(account));
-      updateTrades();
-      renderStats();
-    }
-
-    setInterval(() => {
-      updateTrades();
-    }, 2000);
-
-    updateTrades();
+    // Lightweight Chart Init
+    const chart = LightweightCharts.createChart(document.getElementById("chart"), {
+      layout: { background: { color: '#1e3a8a' }, textColor: 'white' }
+    });
+    const chartSeries = chart.addLineSeries();
+    updateChart(pairSelect.value);
+    setInterval(() => updateChart(pairSelect.value), 2000);
   </script>
 </body>
 </html>
