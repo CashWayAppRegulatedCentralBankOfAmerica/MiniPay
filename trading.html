@@ -5,127 +5,93 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>NovaFX Trading</title>
   <script src="https://cdn.tailwindcss.com"></script>
-  <script src="https://unpkg.com/lightweight-charts@3.7.0/dist/lightweight-charts.standalone.production.js"></script>
-  <script src="https://s3.tradingview.com/tv.js"></script>
 </head>
-<body class="bg-[#1a1a2e] text-white font-sans antialiased">
-  <div class="w-full px-2 max-w-xl mx-auto mt-4 space-y-4">
-    <!-- Redirects -->
-    <div class="flex justify-between">
-      <a href="dashboard.html" class="text-blue-400 underline">Dashboard</a>
-      <a href="history.html" class="text-blue-400 underline">Trade History</a>
+<body class="bg-[#1a1a2e] text-white p-4 font-sans">
+  <div class="max-w-xl mx-auto space-y-6">
+    <div class="flex justify-between items-center">
+      <h1 class="text-2xl font-bold">Trade Market</h1>
+      <a href="dashboard.html" class="text-sm text-blue-400 underline">Dashboard</a>
     </div>
 
-    <!-- Market Pairs -->
-    <div class="bg-gray-900 rounded-2xl p-4">
-      <h3 class="text-lg font-semibold mb-2">Forex Market</h3>
-      <div id="market-prices" class="space-y-2 text-sm"></div>
+    <div>
+      <label for="pair" class="block mb-1">Select Pair</label>
+      <select id="pair" class="w-full p-2 rounded bg-gray-800">
+        <option value="EUR/USD">EUR/USD</option>
+        <option value="GBP/USD">GBP/USD</option>
+        <option value="USD/JPY">USD/JPY</option>
+        <option value="USD/KES">USD/KES</option>
+        <option value="AUD/USD">AUD/USD</option>
+        <option value="USD/CHF">USD/CHF</option>
+        <option value="NZD/USD">NZD/USD</option>
+        <option value="EUR/JPY">EUR/JPY</option>
+        <option value="GBP/JPY">GBP/JPY</option>
+        <option value="USD/CAD">USD/CAD</option>
+        <option value="XAU/USD">XAU/USD (Gold)</option>
+      </select>
     </div>
 
-    <!-- Chart -->
-    <div class="bg-blue-600 rounded-2xl p-4">
-      <h3 class="text-lg font-semibold mb-2">Live Chart</h3>
-      <div class="bg-blue-800 rounded-xl h-64" id="tv-chart"></div>
-    </div>
+    <div id="chart" class="w-full h-64"></div>
 
-    <!-- Trade Form -->
-    <div class="bg-gray-900 rounded-2xl p-4">
-      <h3 class="text-lg font-semibold mb-2">Open Trade</h3>
-      <form id="trade-form" class="space-y-2 text-sm">
-        <select id="pair-select" class="w-full p-2 rounded-lg bg-gray-700 text-white"></select>
-        <input type="number" step="0.01" id="lot-size" placeholder="Lot Size" class="w-full p-2 rounded-lg bg-gray-700 text-white" />
-        <input type="number" step="0.00001" id="stop-loss" placeholder="Stop Loss" class="w-full p-2 rounded-lg bg-gray-700 text-white" />
-        <input type="number" step="0.00001" id="take-profit" placeholder="Take Profit" class="w-full p-2 rounded-lg bg-gray-700 text-white" />
-        <div class="grid grid-cols-2 gap-2">
-          <button type="button" class="bg-green-600 py-2 rounded-xl font-semibold" onclick="submitTrade('buy')">Buy</button>
-          <button type="button" class="bg-red-600 py-2 rounded-xl font-semibold" onclick="submitTrade('sell')">Sell</button>
-        </div>
-      </form>
-    </div>
+    <form id="trade-form" class="space-y-4">
+      <div>
+        <input type="number" step="0.01" id="lot" placeholder="Lot Size (min 0.01)" class="w-full p-2 bg-gray-800 rounded">
+      </div>
+      <div>
+        <input type="number" id="sl" placeholder="Stop Loss" class="w-full p-2 bg-gray-800 rounded">
+      </div>
+      <div>
+        <input type="number" id="tp" placeholder="Take Profit" class="w-full p-2 bg-gray-800 rounded">
+      </div>
+      <div class="grid grid-cols-2 gap-2">
+        <button type="button" onclick="executeTrade('buy')" class="bg-green-600 py-2 rounded">Buy</button>
+        <button type="button" onclick="executeTrade('sell')" class="bg-red-600 py-2 rounded">Sell</button>
+      </div>
+    </form>
+
+    <a href="history.html" class="block text-center mt-4 text-blue-300 underline">View Trade History</a>
   </div>
 
   <script>
-    const pairs = [
-      "EUR/USD", "GBP/USD", "USD/JPY", "USD/KES", "AUD/USD",
-      "USD/CHF", "NZD/USD", "EUR/JPY", "GBP/JPY", "USD/CAD", "XAU/USD"
-    ];
-    let selectedPair = pairs[0];
     let market = {};
+    const pairSelect = document.getElementById('pair');
+    const lotInput = document.getElementById('lot');
+    const slInput = document.getElementById('sl');
+    const tpInput = document.getElementById('tp');
 
-    const pairSelect = document.getElementById("pair-select");
-    const marketPrices = document.getElementById("market-prices");
-    const lotInput = document.getElementById("lot-size");
-    const slInput = document.getElementById("stop-loss");
-    const tpInput = document.getElementById("take-profit");
+    let account = JSON.parse(localStorage.getItem("account")) || {balance: 1000, equity: 1000, usedMargin: 0, pnl: 0, trades: [], history: []};
 
-    function renderPairs() {
-      pairSelect.innerHTML = pairs.map(p => `<option value="${p}">${p}</option>`).join("");
+    function updateMarket() {
+      const pair = pairSelect.value;
+      if (!market[pair]) market[pair] = 1 + Math.random();
+      const change = (Math.random() - 0.5) * 0.01;
+      market[pair] += change;
+      market[pair] = parseFloat(market[pair].toFixed(5));
+      slInput.value = (market[pair] - 0.01).toFixed(5);
+      tpInput.value = (market[pair] + 0.01).toFixed(5);
     }
 
-    function fetchMarketPrices() {
-      pairs.forEach(pair => {
-        const symbol = pair.replace("/", "");
-        fetch(`https://api.twelvedata.com/price?symbol=${symbol}&apikey=fa443b33e32c49e1b03c0be6d9699b1c`)
-          .then(res => res.json())
-          .then(data => {
-            market[pair] = parseFloat(data.price);
-            if (pair === selectedPair) updateAutoFill();
-            renderMarket();
-          });
-      });
-    }
+    pairSelect.addEventListener('change', updateMarket);
+    setInterval(updateMarket, 2000);
+    updateMarket();
 
-    function renderMarket() {
-      marketPrices.innerHTML = pairs.map(pair => `<div class='flex justify-between'><span>${pair}</span><span>${market[pair] ? market[pair].toFixed(5) : '...'}</span></div>`).join("");
-    }
-
-    function updateAutoFill() {
-      const price = market[selectedPair];
-      if (!price) return;
-      const buffer = price * 0.01;
-      slInput.value = (price - buffer).toFixed(5);
-      tpInput.value = (price + buffer).toFixed(5);
-    }
-
-    pairSelect.addEventListener("change", (e) => {
-      selectedPair = e.target.value;
-      updateAutoFill();
-      renderChart(selectedPair);
-    });
-
-    function renderChart(pair) {
-      const symbol = pair.replace("/", "");
-      document.getElementById("tv-chart").innerHTML = "";
-      new TradingView.widget({
-        autosize: true,
-        symbol: `OANDA:${symbol}`,
-        interval: "1",
-        timezone: "Etc/UTC",
-        theme: "dark",
-        style: "1",
-        locale: "en",
-        container_id: "tv-chart"
-      });
-    }
-
-    function submitTrade(type) {
+    function executeTrade(type) {
+      const pair = pairSelect.value;
       const lot = parseFloat(lotInput.value);
       const sl = parseFloat(slInput.value);
       const tp = parseFloat(tpInput.value);
-      const price = market[selectedPair];
-      if (!lot || lot < 0.01) return alert("Invalid lot size");
-      if (type === 'buy' && (sl >= price || tp <= price)) return alert("Invalid SL/TP for Buy");
-      if (type === 'sell' && (sl <= price || tp >= price)) return alert("Invalid SL/TP for Sell");
-      const trades = JSON.parse(localStorage.getItem("trades") || "[]");
-      trades.push({ pair: selectedPair, lot, type, price, sl, tp, opened: Date.now() });
-      localStorage.setItem("trades", JSON.stringify(trades));
-      alert(`${type.toUpperCase()} order for ${selectedPair} placed.`);
-    }
+      const price = market[pair];
 
-    renderPairs();
-    renderChart(selectedPair);
-    fetchMarketPrices();
-    setInterval(fetchMarketPrices, 3000);
+      if (!lot || lot < 0.01) return alert("Invalid lot size. Minimum is 0.01");
+      if ((type === 'buy' && (sl >= price || tp <= price)) || (type === 'sell' && (sl <= price || tp >= price))) {
+        return alert("Invalid SL/TP values for trade direction.");
+      }
+      if (account.freeMargin < lot * 100) return alert("Insufficient funds.");
+
+      account.usedMargin += lot * 100;
+      account.trades.push({pair, lot, type, openPrice: price, sl, tp});
+      localStorage.setItem("account", JSON.stringify(account));
+      alert("Trade opened: " + type.toUpperCase() + " " + pair);
+    }
   </script>
 </body>
 </html>
