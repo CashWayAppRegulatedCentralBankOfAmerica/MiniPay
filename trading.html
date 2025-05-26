@@ -5,50 +5,43 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>NovaFX Trading</title>
   <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://unpkg.com/lightweight-charts@3.7.0/dist/lightweight-charts.standalone.production.js"></script>
+  <script src="https://s3.tradingview.com/tv.js"></script>
 </head>
-<body class="bg-[#1a1a2e] text-white p-4 font-sans">
-  <div class="max-w-xl mx-auto space-y-6">
-    <div class="flex justify-between items-center">
-      <h1 class="text-2xl font-bold">Trade Market</h1>
-      <a href="dashboard.html" class="text-sm text-blue-400 underline">Dashboard</a>
+<body class="bg-[#1a1a2e] text-white font-sans antialiased">
+  <div class="w-full px-2 max-w-xl mx-auto mt-4 space-y-4">
+    <!-- Redirects -->
+    <div class="flex justify-between">
+      <a href="dashboard.html" class="text-blue-400 underline">Dashboard</a>
+      <a href="history.html" class="text-blue-400 underline">Trade History</a>
     </div>
 
-    <div>
-      <label for="pair" class="block mb-1">Select Pair</label>
-      <select id="pair" class="w-full p-2 rounded bg-gray-800">
-        <option value="EUR/USD">EUR/USD</option>
-        <option value="GBP/USD">GBP/USD</option>
-        <option value="USD/JPY">USD/JPY</option>
-        <option value="USD/KES">USD/KES</option>
-        <option value="AUD/USD">AUD/USD</option>
-        <option value="USD/CHF">USD/CHF</option>
-        <option value="NZD/USD">NZD/USD</option>
-        <option value="EUR/JPY">EUR/JPY</option>
-        <option value="GBP/JPY">GBP/JPY</option>
-        <option value="USD/CAD">USD/CAD</option>
-        <option value="XAU/USD">XAU/USD (Gold)</option>
-      </select>
+    <!-- Market Pairs -->
+    <div class="bg-gray-900 rounded-2xl p-4">
+      <h3 class="text-lg font-semibold mb-2">Forex Market</h3>
+      <div id="market-prices" class="space-y-2 text-sm"></div>
     </div>
 
-    <div id="chart" class="w-full h-64"></div>
+    <!-- Chart -->
+    <div class="bg-blue-600 rounded-2xl p-4">
+      <h3 class="text-lg font-semibold mb-2">Live Chart</h3>
+      <div class="bg-blue-800 rounded-xl h-64" id="tv-chart"></div>
+    </div>
 
-    <form id="trade-form" class="space-y-4">
-      <div>
-        <input type="number" step="0.01" id="lot" placeholder="Lot Size (min 0.01)" class="w-full p-2 bg-gray-800 rounded">
-      </div>
-      <div>
-        <input type="number" id="sl" placeholder="Stop Loss" class="w-full p-2 bg-gray-800 rounded">
-      </div>
-      <div>
-        <input type="number" id="tp" placeholder="Take Profit" class="w-full p-2 bg-gray-800 rounded">
-      </div>
-      <div class="grid grid-cols-2 gap-2">
-        <button type="button" onclick="executeTrade('buy')" class="bg-green-600 py-2 rounded">Buy</button>
-        <button type="button" onclick="executeTrade('sell')" class="bg-red-600 py-2 rounded">Sell</button>
-      </div>
-    </form>
-
-    <a href="history.html" class="block text-center mt-4 text-blue-300 underline">View Trade History</a>
+    <!-- Trade Form -->
+    <div class="bg-gray-900 rounded-2xl p-4">
+      <h3 class="text-lg font-semibold mb-2">Open Trade</h3>
+      <form id="trade-form" class="space-y-2 text-sm">
+        <select id="pair-select" class="w-full p-2 rounded-lg bg-gray-700 text-white"></select>
+        <input type="number" step="0.01" id="lot-size" placeholder="Lot Size" class="w-full p-2 rounded-lg bg-gray-700 text-white" />
+        <input type="number" step="0.00001" id="stop-loss" placeholder="Stop Loss" class="w-full p-2 rounded-lg bg-gray-700 text-white" />
+        <input type="number" step="0.00001" id="take-profit" placeholder="Take Profit" class="w-full p-2 rounded-lg bg-gray-700 text-white" />
+        <div class="grid grid-cols-2 gap-2">
+          <button type="button" class="bg-green-600 py-2 rounded-xl font-semibold" onclick="submitTrade('buy')">Buy</button>
+          <button type="button" class="bg-red-600 py-2 rounded-xl font-semibold" onclick="submitTrade('sell')">Sell</button>
+        </div>
+      </form>
+    </div>
   </div>
 
   <script>
