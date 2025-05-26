@@ -3,218 +3,151 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <meta name="theme-color" content="#1a1a2e" />
-  <title>Forex Wallet Platform</title>
+  <title>Forex Trading Demo</title>
   <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    .scrollable-table {
+      max-height: 200px;
+      overflow-y: auto;
+    }
+  </style>
 </head>
-<body class="bg-[#1a1a2e] text-white font-sans antialiased">
-  <div class="w-full max-w-sm mx-auto mt-4 p-4 space-y-4">
+<body class="bg-gray-100 font-sans p-4">
+  <!-- Account Overview -->
+  <div class="bg-white rounded-2xl shadow p-4 mb-4 grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
+    <div><strong>Balance:</strong> $<span id="balance">10000</span></div>
+    <div><strong>Equity:</strong> $<span id="equity">10000</span></div>
+    <div><strong>Free Margin:</strong> $<span id="margin">10000</span></div>
+    <div><strong>P/L:</strong> $<span id="pl">0</span></div>
+  </div>
 
-    <!-- Wallet Section -->
-    <div class="bg-green-600 rounded-2xl p-4">
-      <div class="flex justify-between items-center mb-2">
-        <h2 id="balance" class="text-2xl font-bold">$1000.00</h2>
-        <div class="flex items-center space-x-2">
-          <span class="text-xs text-white">USD</span>
-          <label class="relative inline-flex items-center cursor-pointer">
-            <input type="checkbox" value="" class="sr-only peer">
-            <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-2 peer-focus:ring-green-300 rounded-full peer peer-checked:bg-green-500"></div>
-          </label>
-          <span class="text-xs text-white">KES</span>
-        </div>
-      </div>
-      <div class="grid grid-cols-2 gap-4">
-        <button class="bg-green-700 py-2 rounded-xl text-white font-semibold">Add Cash</button>
-        <button class="bg-green-700 py-2 rounded-xl text-white font-semibold">Withdraw</button>
-      </div>
-    </div>
+  <!-- TradingView Chart -->
+  <div class="mb-4">
+    <iframe src="https://s.tradingview.com/widgetembed/?frameElementId=tradingview_7c28c&symbol=FX:EURUSD&interval=1&hidesidetoolbar=1&symboledit=1&saveimage=1&toolbarbg=f1f3f6&studies=[]&theme=light&style=1&timezone=Etc/UTC&withdateranges=1&hideideas=1&studies_overrides={}&overrides={}" width="100%" height="400" frameborder="0"></iframe>
+  </div>
 
-    <!-- Offer -->
-    <div class="bg-blue-600 rounded-2xl p-4">
-      <h3 class="text-lg font-semibold mb-2">You're almost there!</h3>
-      <p class="text-sm mb-3">Get up to $0.25 back on your first add cash transaction. Earn 2% weekly on your savings.</p>
-      <button class="bg-blue-800 w-full py-2 rounded-xl text-white font-semibold">Add Cash</button>
-    </div>
+  <!-- Trade Controls -->
+  <div class="bg-white rounded-2xl shadow p-4 mb-4 flex flex-col md:flex-row gap-2 items-center">
+    <label for="lot" class="mr-2">Lot Size:</label>
+    <input id="lot" type="number" class="border rounded px-2 py-1 w-24" value="1" min="0.01" step="0.01" />
+    <button onclick="openTrade('buy')" class="bg-green-500 text-white px-4 py-2 rounded-xl shadow hover:bg-green-600">Buy</button>
+    <button onclick="openTrade('sell')" class="bg-red-500 text-white px-4 py-2 rounded-xl shadow hover:bg-red-600">Sell</button>
+  </div>
 
-    <!-- Trade Controls -->
-    <div class="bg-gray-800 rounded-2xl p-4 space-y-2">
-      <h3 class="text-lg font-semibold">Trade Forex</h3>
-      <select class="w-full bg-gray-700 text-white p-2 rounded-xl">
-        <option>EUR/USD</option>
-        <option>GBP/USD</option>
-        <option>USD/JPY</option>
-        <option>USD/KES</option>
-      </select>
-      <input type="number" placeholder="Lot size (e.g. 0.1)" class="w-full bg-gray-700 p-2 rounded-xl text-white">
-      <div class="flex gap-4 mt-2">
-        <button class="bg-green-600 flex-1 py-2 rounded-xl text-white font-semibold">Buy</button>
-        <button class="bg-red-600 flex-1 py-2 rounded-xl text-white font-semibold">Sell</button>
-      </div>
-    </div>
-
-    <!-- Market Prices -->
-    <div class="bg-gray-800 rounded-2xl p-4">
-      <h3 class="text-lg font-semibold mb-2">Live Market Prices</h3>
-      <div class="space-y-2 text-sm">
-        <div class="flex justify-between"><span>EUR/USD</span><span data-market="EUR/USD">--</span></div>
-        <div class="flex justify-between"><span>GBP/USD</span><span data-market="GBP/USD">--</span></div>
-        <div class="flex justify-between"><span>USD/JPY</span><span data-market="USD/JPY">--</span></div>
-        <div class="flex justify-between"><span>USD/KES</span><span data-market="USD/KES">--</span></div>
-      </div>
-    </div>
-
-    <!-- Account Info -->
-    <div class="bg-gray-800 rounded-2xl p-4 space-y-1 text-sm">
-      <h3 class="text-lg font-semibold mb-2">Account Summary</h3>
-      <p id="equity">Equity: $1000.00</p>
-      <p id="used-margin">Used Margin: $100.00</p>
-      <p id="free-margin">Free Margin: $900.00</p>
-      <p id="pnl">P&L: <span class="text-green-300">0.00</span></p>
-    </div>
-
-    <!-- Open Trades -->
-    <div class="bg-gray-800 rounded-2xl p-4">
-      <div class="flex justify-between items-center mb-2">
-        <h3 class="text-lg font-semibold">Open Trades</h3>
-      </div>
-      <div id="open-trades" class="space-y-2 text-sm">
-        <!-- Dynamic trades appear here -->
-      </div>
-    </div>
-
-    <!-- Activity Log -->
-    <div class="bg-gray-800 rounded-2xl p-4">
-      <div class="flex justify-between items-center mb-2">
-        <h3 class="text-lg font-semibold">Recent activity</h3>
-      </div>
-      <div class="space-y-4">
-        <div class="flex justify-between items-center bg-gray-700 p-4 rounded-xl mb-2">
-          <div class="flex items-center space-x-3">
-            <div class="bg-blue-500 p-2 rounded-full">📦</div>
-            <div><h4 class="font-medium">Reward</h4><span class="text-xs text-gray-400">8 hr ago</span></div>
-          </div>
-          <span class="text-green-400">+$0.01</span>
-        </div>
-        <!-- Add more rewards if needed -->
-      </div>
+  <!-- Open Trades -->
+  <div class="bg-white rounded-2xl shadow p-4 mb-4">
+    <h2 class="text-lg font-bold mb-2">Open Trades</h2>
+    <div class="scrollable-table">
+      <table class="w-full text-sm text-left">
+        <thead>
+          <tr>
+            <th>Type</th>
+            <th>Lot</th>
+            <th>Entry</th>
+            <th>Current</th>
+            <th>P/L</th>
+            <th>Action</th>
+          </tr>
+        </thead>
+        <tbody id="openTrades"></tbody>
+      </table>
     </div>
   </div>
 
-  <!-- DYNAMIC SCRIPT -->
+  <!-- Trade History -->
+  <div class="bg-white rounded-2xl shadow p-4">
+    <h2 class="text-lg font-bold mb-2">Trade History</h2>
+    <div class="scrollable-table">
+      <table class="w-full text-sm text-left">
+        <thead>
+          <tr>
+            <th>Type</th>
+            <th>Lot</th>
+            <th>Entry</th>
+            <th>Exit</th>
+            <th>P/L</th>
+          </tr>
+        </thead>
+        <tbody id="tradeHistory"></tbody>
+      </table>
+    </div>
+  </div>
+
   <script>
-    const pairs = ["EUR/USD", "GBP/USD", "USD/JPY", "USD/KES"];
-    const prices = {};
-    const trades = [];
-    let balance = 1000;
-    let usedMargin = 100;
-    let pnl = 0;
+    let balance = 10000;
+    let trades = [];
+    let currentPrice = 1.0850;
 
-    function formatNum(num) {
-      return parseFloat(num).toFixed(4);
-    }
+    function updateUI() {
+      const openTrades = document.getElementById("openTrades");
+      const tradeHistory = document.getElementById("tradeHistory");
+      openTrades.innerHTML = "";
+      let pl = 0;
 
-    async function fetchPrices() {
-      const symbols = {
-        "EUR/USD": "EUR/USD",
-        "GBP/USD": "GBP/USD",
-        "USD/JPY": "USD/JPY",
-        "USD/KES": "USD/KES"
-      };
-      const apiKey = "fa443b33e32c49e1b03c0be6d9699b1c";
+      trades.filter(t => !t.closed).forEach((trade, i) => {
+        const diff = (currentPrice - trade.entry) * (trade.type === 'buy' ? 1 : -1);
+        const profit = diff * trade.lot * 100000;
+        pl += profit;
+        trade.currentPrice = currentPrice;
+        trade.profit = profit;
 
-      for (const pair in symbols) {
-        const url = `https://api.twelvedata.com/price?symbol=${symbols[pair]}&apikey=${apiKey}`;
-        const res = await fetch(url);
-        const data = await res.json();
-        prices[pair] = parseFloat(data.price);
-      }
-
-      updatePrices();
-      updateTrades();
-      updateAccount();
-    }
-
-    function updatePrices() {
-      document.querySelectorAll("[data-market]").forEach(el => {
-        const pair = el.getAttribute("data-market");
-        if (prices[pair]) el.textContent = formatNum(prices[pair]);
-      });
-    }
-
-    function updateTrades() {
-      let openTradeList = document.querySelector("#open-trades");
-      openTradeList.innerHTML = "";
-      pnl = 0;
-
-      trades.forEach((trade, index) => {
-        const currentPrice = prices[trade.pair];
-        if (!currentPrice) return;
-
-        const movement = trade.type === "Buy"
-          ? (currentPrice - trade.entry)
-          : (trade.entry - currentPrice);
-
-        const tradePnl = movement * 100000 * trade.lotSize;
-        pnl += tradePnl;
-
-        const item = document.createElement("div");
-        item.className = "bg-gray-700 p-3 rounded-xl flex justify-between items-center text-sm";
-        item.innerHTML = `
-          <div>
-            <p>${trade.pair} - ${trade.type}</p>
-            <p class="text-xs text-gray-400">Lot: ${trade.lotSize} | P&L: <span class="${tradePnl >= 0 ? 'text-green-400' : 'text-red-400'}">${tradePnl.toFixed(2)}</span></p>
-          </div>
-          <button onclick="closeTrade(${index})" class="bg-red-500 text-white text-xs px-2 py-1 rounded">Close</button>
+        openTrades.innerHTML += `
+          <tr>
+            <td>${trade.type}</td>
+            <td>${trade.lot}</td>
+            <td>${trade.entry.toFixed(5)}</td>
+            <td>${currentPrice.toFixed(5)}</td>
+            <td class="${profit >= 0 ? 'text-green-600' : 'text-red-600'}">${profit.toFixed(2)}</td>
+            <td><button onclick="closeTrade(${i})" class="text-blue-600">Close</button></td>
+          </tr>
         `;
-        openTradeList.appendChild(item);
       });
-    }
 
-    function updateAccount() {
-      const equity = balance + pnl;
-      const freeMargin = equity - usedMargin;
+      document.getElementById("pl").innerText = pl.toFixed(2);
+      document.getElementById("equity").innerText = (balance + pl).toFixed(2);
+      document.getElementById("margin").innerText = (balance + pl).toFixed(2);
+      document.getElementById("balance").innerText = balance.toFixed(2);
 
-      document.querySelector("#balance").textContent = "$" + balance.toFixed(2);
-      document.querySelector("#equity").textContent = "Equity: $" + equity.toFixed(2);
-      document.querySelector("#free-margin").textContent = "Free Margin: $" + freeMargin.toFixed(2);
-      document.querySelector("#used-margin").textContent = "Used Margin: $" + usedMargin.toFixed(2);
-      document.querySelector("#pnl").innerHTML = "P&L: <span class='" + (pnl >= 0 ? "text-green-300" : "text-red-300") + "'>" + pnl.toFixed(2) + "</span>";
+      // History
+      const closed = trades.filter(t => t.closed);
+      tradeHistory.innerHTML = "";
+      closed.forEach(trade => {
+        tradeHistory.innerHTML += `
+          <tr>
+            <td>${trade.type}</td>
+            <td>${trade.lot}</td>
+            <td>${trade.entry.toFixed(5)}</td>
+            <td>${trade.exit.toFixed(5)}</td>
+            <td class="${trade.profit >= 0 ? 'text-green-600' : 'text-red-600'}">${trade.profit.toFixed(2)}</td>
+          </tr>
+        `;
+      });
     }
 
     function openTrade(type) {
-      const pair = document.querySelector("select").value;
-      const lotSize = parseFloat(document.querySelector("input[type='number']").value) || 0.1;
-      const entry = prices[pair] || 0;
-
-      if (!entry) return alert("Price not loaded yet.");
-      trades.push({ pair, type, lotSize, entry });
-      usedMargin += 50;
-      updateTrades();
-      updateAccount();
+      const lot = parseFloat(document.getElementById("lot").value);
+      if (isNaN(lot) || lot <= 0) return alert("Invalid lot size");
+      trades.push({ type, lot, entry: currentPrice, closed: false });
+      updateUI();
     }
 
     function closeTrade(index) {
-      trades.splice(index, 1);
-      usedMargin -= 50;
-      updateTrades();
-      updateAccount();
+      const trade = trades[index];
+      if (!trade || trade.closed) return;
+      trade.closed = true;
+      trade.exit = currentPrice;
+      balance += trade.profit;
+      updateUI();
     }
 
-    document.querySelector(".bg-green-600 button:nth-child(1)").addEventListener("click", () => {
-      balance += 100;
-      updateAccount();
-    });
+    // Simulate price changes
+    setInterval(() => {
+      const rnd = (Math.random() - 0.5) * 0.0005;
+      currentPrice += rnd;
+      updateUI();
+    }, 1000);
 
-    document.querySelector(".bg-green-600 button:nth-child(2)").addEventListener("click", () => {
-      balance -= 100;
-      updateAccount();
-    });
-
-    document.querySelector(".bg-green-600 ~ .bg-blue-600 + .bg-gray-800 button.bg-green-600").addEventListener("click", () => openTrade("Buy"));
-    document.querySelector(".bg-green-600 ~ .bg-blue-600 + .bg-gray-800 button.bg-red-600").addEventListener("click", () => openTrade("Sell"));
-
-    setInterval(fetchPrices, 5000);
-    fetchPrices();
+    updateUI();
   </script>
 </body>
 </html>
