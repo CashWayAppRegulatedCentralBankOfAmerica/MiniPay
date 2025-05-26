@@ -3,18 +3,26 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Forex Trading Demo</title>
+  <title>NovaFX Trading Demo</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <style>
+    body {
+      font-family: 'Inter', sans-serif;
+    }
     .scrollable-table {
       max-height: 200px;
       overflow-y: auto;
     }
   </style>
 </head>
-<body class="bg-gray-100 font-sans p-4">
+<body class="bg-[#f8f9fb] text-gray-800">
+  <!-- NovaFX Header -->
+  <header class="bg-white shadow p-4 mb-4 rounded-b-2xl">
+    <div class="text-xl font-semibold text-center text-[#0f172a]">NovaFX Demo Trading Platform</div>
+  </header>
+
   <!-- Account Overview -->
-  <div class="bg-white rounded-2xl shadow p-4 mb-4 grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
+  <div class="bg-white rounded-2xl shadow-md p-4 mb-6 grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
     <div><strong>Balance:</strong> $<span id="balance">10000</span></div>
     <div><strong>Equity:</strong> $<span id="equity">10000</span></div>
     <div><strong>Free Margin:</strong> $<span id="margin">10000</span></div>
@@ -22,24 +30,28 @@
   </div>
 
   <!-- TradingView Chart -->
-  <div class="mb-4">
+  <div class="mb-6 rounded-2xl overflow-hidden shadow">
     <iframe src="https://s.tradingview.com/widgetembed/?frameElementId=tradingview_7c28c&symbol=FX:EURUSD&interval=1&hidesidetoolbar=1&symboledit=1&saveimage=1&toolbarbg=f1f3f6&studies=[]&theme=light&style=1&timezone=Etc/UTC&withdateranges=1&hideideas=1&studies_overrides={}&overrides={}" width="100%" height="400" frameborder="0"></iframe>
   </div>
 
   <!-- Trade Controls -->
-  <div class="bg-white rounded-2xl shadow p-4 mb-4 flex flex-col md:flex-row gap-2 items-center">
-    <label for="lot" class="mr-2">Lot Size:</label>
-    <input id="lot" type="number" class="border rounded px-2 py-1 w-24" value="1" min="0.01" step="0.01" />
-    <button onclick="openTrade('buy')" class="bg-green-500 text-white px-4 py-2 rounded-xl shadow hover:bg-green-600">Buy</button>
-    <button onclick="openTrade('sell')" class="bg-red-500 text-white px-4 py-2 rounded-xl shadow hover:bg-red-600">Sell</button>
+  <div class="bg-white rounded-2xl shadow-md p-4 mb-6 flex flex-col md:flex-row gap-4 items-center justify-between">
+    <div class="flex items-center gap-2">
+      <label for="lot" class="text-sm font-medium">Lot Size:</label>
+      <input id="lot" type="number" class="border border-gray-300 rounded-lg px-3 py-2 w-24" value="1" min="0.01" step="0.01" />
+    </div>
+    <div class="flex gap-3">
+      <button onclick="openTrade('buy')" class="bg-[#10b981] text-white px-6 py-2 rounded-xl shadow hover:bg-[#059669] transition">Buy</button>
+      <button onclick="openTrade('sell')" class="bg-[#ef4444] text-white px-6 py-2 rounded-xl shadow hover:bg-[#dc2626] transition">Sell</button>
+    </div>
   </div>
 
   <!-- Open Trades -->
-  <div class="bg-white rounded-2xl shadow p-4 mb-4">
-    <h2 class="text-lg font-bold mb-2">Open Trades</h2>
+  <div class="bg-white rounded-2xl shadow-md p-4 mb-6">
+    <h2 class="text-lg font-semibold text-[#0f172a] mb-3">Open Trades</h2>
     <div class="scrollable-table">
       <table class="w-full text-sm text-left">
-        <thead>
+        <thead class="text-gray-500 border-b">
           <tr>
             <th>Type</th>
             <th>Lot</th>
@@ -55,11 +67,11 @@
   </div>
 
   <!-- Trade History -->
-  <div class="bg-white rounded-2xl shadow p-4">
-    <h2 class="text-lg font-bold mb-2">Trade History</h2>
+  <div class="bg-white rounded-2xl shadow-md p-4 mb-10">
+    <h2 class="text-lg font-semibold text-[#0f172a] mb-3">Trade History</h2>
     <div class="scrollable-table">
       <table class="w-full text-sm text-left">
-        <thead>
+        <thead class="text-gray-500 border-b">
           <tr>
             <th>Type</th>
             <th>Lot</th>
@@ -73,6 +85,7 @@
     </div>
   </div>
 
+  <!-- JavaScript -->
   <script>
     let balance = 10000;
     let trades = [];
@@ -98,7 +111,7 @@
             <td>${trade.entry.toFixed(5)}</td>
             <td>${currentPrice.toFixed(5)}</td>
             <td class="${profit >= 0 ? 'text-green-600' : 'text-red-600'}">${profit.toFixed(2)}</td>
-            <td><button onclick="closeTrade(${i})" class="text-blue-600">Close</button></td>
+            <td><button onclick="closeTrade(${i})" class="text-blue-600 underline">Close</button></td>
           </tr>
         `;
       });
