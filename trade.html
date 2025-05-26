@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>NovaFX Trade</title>
+  <title>NovaFX Trading</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <style>
     @media (min-width: 768px) {
@@ -16,76 +16,93 @@
 </head>
 <body class="bg-[#1a1a2e] text-white font-sans antialiased">
   <div class="w-full px-2 responsive-container mt-4 space-y-4">
-    <!-- Back to Dashboard -->
-    <div>
-      <a href="index.html" class="text-xs bg-blue-500 px-3 py-1 rounded">← Back to Dashboard</a>
-    </div>
-
-    <!-- Market Widget -->
-    <div class="bg-gray-900 rounded-2xl p-2">
-      <iframe src="https://www.tradingview.com/widgetembed/?frameElementId=tradingview_b2a6b&symbol=FX:EURUSD,FX:GBPUSD,FX:USDJPY,FX:USDCHF,FX:AUDUSD,FX:USDCAD,FX:NZDUSD,FX:EURGBP,FX:EURJPY,FX:GBPJPY,FX:XAUUSD&interval=1&theme=dark&style=1&timezone=Etc%2FUTC&withdateranges=1&hide_side_toolbar=false&allow_symbol_change=true&save_image=true&studies=[]" width="100%" height="400" frameborder="0" allowtransparency="true" scrolling="no"></iframe>
-    </div>
-
-    <!-- Trade Form -->
+    <!-- Forex Markets Section -->
     <div class="bg-gray-800 rounded-2xl p-4">
-      <h3 class="text-lg font-semibold mb-2">Open Trade</h3>
-      <form id="trade-form" class="space-y-2">
-        <div>
-          <label class="block text-sm">Pair</label>
-          <select id="pair" class="w-full bg-gray-900 p-2 rounded-xl">
-            <option>EURUSD</option>
-            <option>GBPUSD</option>
-            <option>USDJPY</option>
-            <option>USDCHF</option>
-            <option>AUDUSD</option>
-            <option>USDCAD</option>
-            <option>NZDUSD</option>
-            <option>EURGBP</option>
-            <option>EURJPY</option>
-            <option>GBPJPY</option>
-            <option>XAUUSD</option>
-          </select>
-        </div>
-        <div>
-          <label class="block text-sm">Type</label>
-          <select id="type" class="w-full bg-gray-900 p-2 rounded-xl">
-            <option>Buy</option>
-            <option>Sell</option>
-          </select>
-        </div>
-        <div>
-          <label class="block text-sm">Lot Size</label>
-          <input type="number" id="lot" step="0.01" min="0.01" value="0.01" class="w-full bg-gray-900 p-2 rounded-xl" />
-        </div>
-        <button type="submit" class="w-full bg-green-600 py-2 rounded-xl font-semibold">Place Trade</button>
-      </form>
+      <h2 class="text-lg font-bold mb-2">Live Forex Markets</h2>
+      <select id="pair" class="w-full p-2 bg-gray-900 rounded text-white mb-2">
+        <option value="EURUSD">EUR/USD</option>
+        <option value="GBPUSD">GBP/USD</option>
+        <option value="USDJPY">USD/JPY</option>
+        <option value="USDKES">USD/KES</option>
+        <option value="AUDUSD">AUD/USD</option>
+        <option value="USDCHF">USD/CHF</option>
+        <option value="NZDUSD">NZD/USD</option>
+        <option value="EURJPY">EUR/JPY</option>
+        <option value="GBPJPY">GBP/JPY</option>
+        <option value="USDCAD">USD/CAD</option>
+        <option value="XAUUSD">Gold (XAU/USD)</option>
+      </select>
+      <div class="flex gap-2">
+        <button onclick="trade('buy')" class="bg-green-600 px-4 py-2 rounded-xl w-full">Buy</button>
+        <button onclick="trade('sell')" class="bg-red-600 px-4 py-2 rounded-xl w-full">Sell</button>
+      </div>
+    </div>
+
+    <!-- TradingView Chart -->
+    <div class="bg-gray-800 rounded-2xl p-2">
+      <div id="tv_chart_container"></div>
+    </div>
+
+    <!-- Navigation -->
+    <div class="text-center">
+      <a href="index.html" class="text-blue-400 underline">Back to Dashboard</a>
     </div>
   </div>
 
+  <!-- TradingView Widget -->
+  <script type="text/javascript" src="https://s3.tradingview.com/tv.js"></script>
   <script>
-    const tradeForm = document.getElementById("trade-form");
-    tradeForm.onsubmit = function (e) {
-      e.preventDefault();
-      const pair = document.getElementById("pair").value;
-      const type = document.getElementById("type").value;
-      const lot = parseFloat(document.getElementById("lot").value);
-
-      let account = JSON.parse(localStorage.getItem("account")) || {
-        balance: 1000,
-        equity: 1000,
-        usedMargin: 0,
-        pnl: 0,
-        trades: [],
-        history: [],
-      };
-
-      const marginUsed = lot * 100;
-      account.usedMargin += marginUsed;
-      account.trades.push({ pair, type, lot });
-
-      localStorage.setItem("account", JSON.stringify(account));
-      window.location.href = "index.html";
+    let account = JSON.parse(localStorage.getItem("account")) || {
+      balance: 1000,
+      equity: 1000,
+      usedMargin: 0,
+      pnl: 0,
+      trades: [],
+      history: []
     };
+
+    const pairSelect = document.getElementById("pair");
+
+    function renderChart(symbol) {
+      document.getElementById("tv_chart_container").innerHTML = "";
+      new TradingView.widget({
+        container_id: "tv_chart_container",
+        autosize: true,
+        symbol: "OANDA:" + symbol,
+        interval: "1",
+        timezone: "Etc/UTC",
+        theme: "dark",
+        style: "1",
+        locale: "en",
+        toolbar_bg: "#1a1a2e",
+        enable_publishing: false,
+        hide_legend: false,
+        allow_symbol_change: true,
+        save_image: false,
+        studies: ["MACD@tv-basicstudies"],
+        withdateranges: true
+      });
+    }
+
+    renderChart(pairSelect.value);
+    pairSelect.addEventListener("change", () => renderChart(pairSelect.value));
+
+    function trade(type) {
+      const pair = pairSelect.value;
+      const lot = 1;
+      const openPrice = 1 + Math.random(); // Fake price, real logic would use live price
+      const marginUsed = lot * 100;
+
+      if (account.freeMargin < marginUsed) {
+        alert("Not enough margin");
+        return;
+      }
+
+      account.trades.push({ pair, type, lot, openPrice, time: Date.now() });
+      account.usedMargin += marginUsed;
+      localStorage.setItem("account", JSON.stringify(account));
+      alert(`${type.toUpperCase()} trade opened on ${pair}`);
+    }
   </script>
 </body>
 </html>
