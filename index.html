@@ -19,7 +19,7 @@
       <div class="text-sm text-white space-y-1 mb-3">
         <p>Equity: $<span id="equity">10000</span></p>
         <p>Free Margin: $<span id="margin">10000</span></p>
-        <p>Used Margin: $0</p>
+        <p>Used Margin: $<span id="usedMargin">0</span></p>
         <p>P&L: <span id="pl" class="text-green-300">+0.00</span></p>
       </div>
       <div class="grid grid-cols-2 gap-4">
@@ -33,9 +33,9 @@
       <h3 class="text-lg font-semibold mb-2">Forex Market</h3>
       <div class="space-y-2 text-sm">
         <div class="flex justify-between"><span>EUR/USD</span><span id="eurusd">1.0850</span></div>
-        <div class="flex justify-between"><span>GBP/USD</span><span>1.2754</span></div>
-        <div class="flex justify-between"><span>USD/JPY</span><span>156.24</span></div>
-        <div class="flex justify-between"><span>USD/KES</span><span>139.10</span></div>
+        <div class="flex justify-between"><span>GBP/USD</span><span id="gbpusd">1.2754</span></div>
+        <div class="flex justify-between"><span>USD/JPY</span><span id="usdjpy">156.24</span></div>
+        <div class="flex justify-between"><span>USD/KES</span><span id="usdkes">139.10</span></div>
       </div>
     </div>
 
@@ -43,7 +43,7 @@
     <div class="bg-blue-600 rounded-2xl p-4">
       <h3 class="text-lg font-semibold mb-2">Price Chart</h3>
       <div class="bg-blue-800 rounded-xl h-40 overflow-hidden">
-        <iframe class="w-full h-full rounded-xl" src="https://s.tradingview.com/widgetembed/?frameElementId=tradingview_7c28c&symbol=FX:EURUSD&interval=1&hidesidetoolbar=1&symboledit=1&saveimage=1&toolbarbg=f1f3f6&studies=[]&theme=dark&style=1&timezone=Etc/UTC&withdateranges=1&hideideas=1&studies_overrides={}&overrides={}" frameborder="0"></iframe>
+        <iframe id="chartFrame" class="w-full h-full rounded-xl" src="https://s.tradingview.com/widgetembed/?symbol=FX:EURUSD&interval=1&theme=dark&style=1" frameborder="0"></iframe>
       </div>
     </div>
 
@@ -51,10 +51,15 @@
     <div class="bg-gray-900 rounded-2xl p-4">
       <h3 class="text-lg font-semibold mb-2">Open Trade</h3>
       <form class="space-y-2 text-sm">
-        <select id="symbol" class="w-full p-2 rounded-lg bg-gray-700 text-white">
+        <select id="symbol" class="w-full p-2 rounded-lg bg-gray-700 text-white" onchange="updateChart()">
           <option value="EUR/USD">EUR/USD</option>
+          <option value="GBP/USD">GBP/USD</option>
+          <option value="USD/JPY">USD/JPY</option>
+          <option value="USD/KES">USD/KES</option>
         </select>
         <input id="lot" type="number" placeholder="Lot Size" class="w-full p-2 rounded-lg bg-gray-700 text-white" value="1" min="0.01" step="0.01" />
+        <input id="sl" type="number" placeholder="Stop Loss (price)" class="w-full p-2 rounded-lg bg-gray-700 text-white" />
+        <input id="tp" type="number" placeholder="Take Profit (price)" class="w-full p-2 rounded-lg bg-gray-700 text-white" />
         <div class="grid grid-cols-2 gap-2">
           <button type="button" onclick="openTrade('buy')" class="bg-green-600 py-2 rounded-xl font-semibold">Buy</button>
           <button type="button" onclick="openTrade('sell')" class="bg-red-600 py-2 rounded-xl font-semibold">Sell</button>
@@ -81,17 +86,41 @@
   <script>
     let balance = 10000;
     let trades = [];
-    let currentPrice = 1.0850;
+    let prices = {
+      'EUR/USD': 1.0850,
+      'GBP/USD': 1.2754,
+      'USD/JPY': 156.24,
+      'USD/KES': 139.10
+    };
+
+    function getPrice(symbol) {
+      return prices[symbol];
+    }
 
     function updateUI() {
-      document.getElementById("eurusd").textContent = currentPrice.toFixed(5);
+      document.getElementById("eurusd").textContent = prices['EUR/USD'].toFixed(5);
+      document.getElementById("gbpusd").textContent = prices['GBP/USD'].toFixed(5);
+      document.getElementById("usdjpy").textContent = prices['USD/JPY'].toFixed(2);
+      document.getElementById("usdkes").textContent = prices['USD/KES'].toFixed(2);
+      
       let pl = 0;
+      let usedMargin = 0;
       let openHTML = "";
+
       trades.filter(t => !t.closed).forEach((trade, i) => {
-        const diff = (currentPrice - trade.entry) * (trade.type === 'buy' ? 1 : -1);
+        let price = getPrice(trade.symbol);
+        const diff = (price - trade.entry) * (trade.type === 'buy' ? 1 : -1);
         const profit = diff * trade.lot * 100000;
-        pl += profit;
         trade.profit = profit;
+        pl += profit;
+        usedMargin += trade.lot * 1000;
+
+        if ((trade.sl && ((trade.type === 'buy' && price <= trade.sl) || (trade.type === 'sell' && price >= trade.sl))) ||
+            (trade.tp && ((trade.type === 'buy' && price >= trade.tp) || (trade.type === 'sell' && price <= trade.tp)))) {
+          closeTrade(i);
+          return;
+        }
+
         openHTML += `
           <div class='bg-gray-700 p-3 rounded-xl flex justify-between items-center'>
             <div>
@@ -101,14 +130,25 @@
             <button onclick='closeTrade(${i})' class='bg-red-500 text-white text-xs px-2 py-1 rounded'>Close</button>
           </div>`;
       });
-      document.getElementById("openTrades").innerHTML = openHTML;
-      document.getElementById("pl").textContent = (pl >= 0 ? '+' : '') + pl.toFixed(2);
-      document.getElementById("equity").textContent = (balance + pl).toFixed(2);
-      document.getElementById("margin").textContent = (balance + pl).toFixed(2);
 
-      const closed = trades.filter(t => t.closed);
+      const equity = balance + pl;
+      const freeMargin = equity - usedMargin;
+
+      document.getElementById("balance").textContent = balance.toFixed(2);
+      document.getElementById("equity").textContent = equity.toFixed(2);
+      document.getElementById("margin").textContent = freeMargin.toFixed(2);
+      document.getElementById("usedMargin").textContent = usedMargin.toFixed(2);
+      document.getElementById("pl").textContent = (pl >= 0 ? '+' : '') + pl.toFixed(2);
+      document.getElementById("openTrades").innerHTML = openHTML;
+
+      if (equity <= 0) {
+        alert("Account blown!");
+        trades = [];
+        balance = 0;
+      }
+
       let histHTML = "";
-      closed.forEach(trade => {
+      trades.filter(t => t.closed).forEach(trade => {
         histHTML += `
           <div class='flex justify-between items-center bg-gray-700 p-4 rounded-xl'>
             <div>
@@ -124,8 +164,12 @@
     function openTrade(type) {
       const lot = parseFloat(document.getElementById("lot").value);
       const symbol = document.getElementById("symbol").value;
+      const sl = parseFloat(document.getElementById("sl").value);
+      const tp = parseFloat(document.getElementById("tp").value);
       if (isNaN(lot) || lot <= 0) return alert("Invalid lot size");
-      trades.push({ type, lot, symbol, entry: currentPrice, closed: false });
+      if (lot * 1000 > balance) return alert("Insufficient funds");
+      trades.push({ type, lot, symbol, sl, tp, entry: getPrice(symbol), closed: false });
+      balance -= lot * 1000; // simulate margin
       updateUI();
     }
 
@@ -133,15 +177,21 @@
       const trade = trades[index];
       if (!trade || trade.closed) return;
       trade.closed = true;
-      trade.exit = currentPrice;
-      balance += trade.profit;
+      trade.exit = getPrice(trade.symbol);
+      balance += trade.lot * 1000 + trade.profit;
       updateUI();
     }
 
-    // Simulate price changes
+    function updateChart() {
+      const pair = document.getElementById("symbol").value.replace("/", "");
+      document.getElementById("chartFrame").src = `https://s.tradingview.com/widgetembed/?symbol=FX:${pair}&interval=1&theme=dark&style=1`;
+    }
+
     setInterval(() => {
-      const rnd = (Math.random() - 0.5) * 0.0005;
-      currentPrice += rnd;
+      Object.keys(prices).forEach(key => {
+        const rand = (Math.random() - 0.5) * 0.001;
+        prices[key] += rand;
+      });
       updateUI();
     }, 1000);
 
