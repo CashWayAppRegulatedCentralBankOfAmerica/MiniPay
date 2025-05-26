@@ -86,6 +86,9 @@
     const usedMarginEl = document.getElementById("used-margin");
     const pnlEl = document.getElementById("pnl");
 
+    const stopLossInput = document.getElementById("stop-loss");
+    const takeProfitInput = document.getElementById("take-profit");
+
     let account = JSON.parse(localStorage.getItem("account")) || {
       balance: 1000,
       equity: 1000,
@@ -106,7 +109,6 @@
     const openTradesEl = document.getElementById("open-trades");
     const tradeHistoryEl = document.getElementById("trade-history");
 
-    // Chart Init
     const chart = LightweightCharts.createChart(document.getElementById("chart"), {layout: {background: {color: '#1e3a8a'}, textColor: 'white'}});
     const lineSeries = chart.addLineSeries();
 
@@ -128,6 +130,12 @@
       pairSelect.innerHTML = pairs.map(p => `<option value="${p}">${p}</option>`).join("");
     }
 
+    pairSelect.addEventListener("change", () => {
+      const price = market[pairSelect.value];
+      stopLossInput.value = (price * 0.99).toFixed(5);
+      takeProfitInput.value = (price * 1.01).toFixed(5);
+    });
+
     function updateChart() {
       const pair = pairSelect.value;
       const prices = Array.from({length: 30}, (_, i) => ({time: (Date.now()/1000|0)-i*60, value: market[pair] + (Math.random()-0.5)*0.01})).reverse();
@@ -137,10 +145,13 @@
     function openTrade(type) {
       const pair = pairSelect.value;
       const lot = parseFloat(document.getElementById("lot-size").value);
-      const sl = parseFloat(document.getElementById("stop-loss").value);
-      const tp = parseFloat(document.getElementById("take-profit").value);
+      const sl = parseFloat(stopLossInput.value);
+      const tp = parseFloat(takeProfitInput.value);
       const price = market[pair];
       if (!lot || account.freeMargin < lot * 100) return alert("Insufficient funds.");
+      if ((type === 'buy' && (sl >= price || tp <= price)) || (type === 'sell' && (sl <= price || tp >= price))) {
+        return alert("Invalid Stop Loss or Take Profit settings.");
+      }
       account.usedMargin += lot * 100;
       account.trades.push({pair, lot, type, openPrice: price, sl, tp});
       save();
