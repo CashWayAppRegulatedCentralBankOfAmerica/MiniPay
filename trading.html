@@ -1,102 +1,131 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <meta name="theme-color" content="#1a1a2e" />
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>NovaFX Trading</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://unpkg.com/lightweight-charts@3.7.0/dist/lightweight-charts.standalone.production.js"></script>
+  <script src="https://s3.tradingview.com/tv.js"></script>
 </head>
 <body class="bg-[#1a1a2e] text-white font-sans antialiased">
-  <div class="w-full px-2 max-w-3xl mx-auto mt-4 space-y-4">
-    <div class="bg-gray-900 rounded-2xl p-4">
-      <div class="flex justify-between items-center mb-3">
-        <h2 class="text-xl font-bold">Trade Forex</h2>
-        <a href="dashboard.html" class="text-sm text-blue-400 underline">Go to Dashboard</a>
-      </div>
-      <select id="pair-select" class="w-full p-2 rounded-lg bg-gray-700 text-white"></select>
-      <div class="grid grid-cols-3 gap-2 mt-2">
-        <input type="number" id="lot-size" placeholder="Lot Size (e.g. 0.01)" step="0.01" min="0.01" class="p-2 rounded-lg bg-gray-700 text-white" />
-        <input type="number" id="stop-loss" placeholder="Stop Loss" class="p-2 rounded-lg bg-gray-700 text-white" />
-        <input type="number" id="take-profit" placeholder="Take Profit" class="p-2 rounded-lg bg-gray-700 text-white" />
-      </div>
-      <div class="grid grid-cols-2 gap-2 mt-3">
-        <button onclick="openTrade('buy')" class="bg-green-600 py-2 rounded-xl font-semibold">Buy</button>
-        <button onclick="openTrade('sell')" class="bg-red-600 py-2 rounded-xl font-semibold">Sell</button>
-      </div>
+  <div class="w-full px-2 max-w-xl mx-auto mt-4 space-y-4">
+    <!-- Redirects -->
+    <div class="flex justify-between">
+      <a href="dashboard.html" class="text-blue-400 underline">Dashboard</a>
+      <a href="history.html" class="text-blue-400 underline">Trade History</a>
     </div>
 
+    <!-- Market Pairs -->
+    <div class="bg-gray-900 rounded-2xl p-4">
+      <h3 class="text-lg font-semibold mb-2">Forex Market</h3>
+      <div id="market-prices" class="space-y-2 text-sm"></div>
+    </div>
+
+    <!-- Chart -->
     <div class="bg-blue-600 rounded-2xl p-4">
       <h3 class="text-lg font-semibold mb-2">Live Chart</h3>
-      <div class="bg-blue-800 rounded-xl h-64" id="chart"></div>
+      <div class="bg-blue-800 rounded-xl h-64" id="tv-chart"></div>
+    </div>
+
+    <!-- Trade Form -->
+    <div class="bg-gray-900 rounded-2xl p-4">
+      <h3 class="text-lg font-semibold mb-2">Open Trade</h3>
+      <form id="trade-form" class="space-y-2 text-sm">
+        <select id="pair-select" class="w-full p-2 rounded-lg bg-gray-700 text-white"></select>
+        <input type="number" step="0.01" id="lot-size" placeholder="Lot Size" class="w-full p-2 rounded-lg bg-gray-700 text-white" />
+        <input type="number" step="0.00001" id="stop-loss" placeholder="Stop Loss" class="w-full p-2 rounded-lg bg-gray-700 text-white" />
+        <input type="number" step="0.00001" id="take-profit" placeholder="Take Profit" class="w-full p-2 rounded-lg bg-gray-700 text-white" />
+        <div class="grid grid-cols-2 gap-2">
+          <button type="button" class="bg-green-600 py-2 rounded-xl font-semibold" onclick="submitTrade('buy')">Buy</button>
+          <button type="button" class="bg-red-600 py-2 rounded-xl font-semibold" onclick="submitTrade('sell')">Sell</button>
+        </div>
+      </form>
     </div>
   </div>
 
   <script>
-    const pairSelect = document.getElementById("pair-select");
     const pairs = [
       "EUR/USD", "GBP/USD", "USD/JPY", "USD/KES", "AUD/USD",
       "USD/CHF", "NZD/USD", "EUR/JPY", "GBP/JPY", "USD/CAD", "XAU/USD"
     ];
+    let selectedPair = pairs[0];
+    let market = {};
+
+    const pairSelect = document.getElementById("pair-select");
+    const marketPrices = document.getElementById("market-prices");
+    const lotInput = document.getElementById("lot-size");
+    const slInput = document.getElementById("stop-loss");
+    const tpInput = document.getElementById("take-profit");
 
     function renderPairs() {
       pairSelect.innerHTML = pairs.map(p => `<option value="${p}">${p}</option>`).join("");
     }
 
-    function fetchLivePrice(pair) {
-      // Simulate TradingView fetch (replace with real API integration)
-      const base = 1.0 + Math.random();
-      const price = parseFloat((base + (Math.random() - 0.5) * 0.01).toFixed(5));
-      return price;
+    function fetchMarketPrices() {
+      pairs.forEach(pair => {
+        const symbol = pair.replace("/", "");
+        fetch(`https://api.twelvedata.com/price?symbol=${symbol}&apikey=fa443b33e32c49e1b03c0be6d9699b1c`)
+          .then(res => res.json())
+          .then(data => {
+            market[pair] = parseFloat(data.price);
+            if (pair === selectedPair) updateAutoFill();
+            renderMarket();
+          });
+      });
     }
 
-    function updateChart(pair) {
-      const prices = Array.from({length: 30}, (_, i) => ({
-        time: (Date.now() / 1000 | 0) - i * 60,
-        value: fetchLivePrice(pair)
-      })).reverse();
-      chartSeries.setData(prices);
+    function renderMarket() {
+      marketPrices.innerHTML = pairs.map(pair => `<div class='flex justify-between'><span>${pair}</span><span>${market[pair] ? market[pair].toFixed(5) : '...'}</span></div>`).join("");
     }
 
-    function openTrade(type) {
-      const pair = pairSelect.value;
-      const lot = parseFloat(document.getElementById("lot-size").value);
-      const sl = parseFloat(document.getElementById("stop-loss").value);
-      const tp = parseFloat(document.getElementById("take-profit").value);
-      const price = fetchLivePrice(pair);
+    function updateAutoFill() {
+      const price = market[selectedPair];
+      if (!price) return;
+      const buffer = price * 0.01;
+      slInput.value = (price - buffer).toFixed(5);
+      tpInput.value = (price + buffer).toFixed(5);
+    }
 
-      if (!lot || lot < 0.01) return alert("Lot size too small");
-      if (isNaN(sl) || isNaN(tp)) return alert("SL and TP required");
-      if ((type === 'buy' && (sl >= price || tp <= price)) || (type === 'sell' && (sl <= price || tp >= price))) {
-        return alert("Invalid SL or TP");
-      }
+    pairSelect.addEventListener("change", (e) => {
+      selectedPair = e.target.value;
+      updateAutoFill();
+      renderChart(selectedPair);
+    });
 
-      const acc = JSON.parse(localStorage.getItem("account")) || {
-        balance: 1000, equity: 1000, usedMargin: 0, pnl: 0, trades: [], history: []
-      };
+    function renderChart(pair) {
+      const symbol = pair.replace("/", "");
+      document.getElementById("tv-chart").innerHTML = "";
+      new TradingView.widget({
+        autosize: true,
+        symbol: `OANDA:${symbol}`,
+        interval: "1",
+        timezone: "Etc/UTC",
+        theme: "dark",
+        style: "1",
+        locale: "en",
+        container_id: "tv-chart"
+      });
+    }
 
-      if (acc.freeMargin !== undefined && acc.freeMargin < lot * 100) {
-        alert("Insufficient margin.");
-        return;
-      }
-
-      acc.usedMargin += lot * 100;
-      acc.trades.push({pair, lot, type, openPrice: price, sl, tp});
-      localStorage.setItem("account", JSON.stringify(acc));
-      alert("Trade opened successfully!");
+    function submitTrade(type) {
+      const lot = parseFloat(lotInput.value);
+      const sl = parseFloat(slInput.value);
+      const tp = parseFloat(tpInput.value);
+      const price = market[selectedPair];
+      if (!lot || lot < 0.01) return alert("Invalid lot size");
+      if (type === 'buy' && (sl >= price || tp <= price)) return alert("Invalid SL/TP for Buy");
+      if (type === 'sell' && (sl <= price || tp >= price)) return alert("Invalid SL/TP for Sell");
+      const trades = JSON.parse(localStorage.getItem("trades") || "[]");
+      trades.push({ pair: selectedPair, lot, type, price, sl, tp, opened: Date.now() });
+      localStorage.setItem("trades", JSON.stringify(trades));
+      alert(`${type.toUpperCase()} order for ${selectedPair} placed.`);
     }
 
     renderPairs();
-    pairSelect.addEventListener('change', () => updateChart(pairSelect.value));
-
-    // Lightweight Chart Init
-    const chart = LightweightCharts.createChart(document.getElementById("chart"), {
-      layout: { background: { color: '#1e3a8a' }, textColor: 'white' }
-    });
-    const chartSeries = chart.addLineSeries();
-    updateChart(pairSelect.value);
-    setInterval(() => updateChart(pairSelect.value), 2000);
+    renderChart(selectedPair);
+    fetchMarketPrices();
+    setInterval(fetchMarketPrices, 3000);
   </script>
 </body>
 </html>
