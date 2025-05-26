@@ -1,89 +1,106 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="theme-color" content="#1a1a2e">
-    <title>MiniPay Wallet</title>
-    <script src="https://cdn.tailwindcss.com"></script>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="theme-color" content="#1a1a2e" />
+  <title>NovaFX Wallet</title>
+  <script src="https://cdn.tailwindcss.com"></script>
 </head>
 <body class="bg-[#1a1a2e] text-white font-sans antialiased">
-    <div class="w-full max-w-sm mx-auto mt-4 p-4">
-        <div class="bg-green-600 rounded-2xl p-4 mb-4">
-            <div class="flex justify-between items-center mb-2">
-                <h2 class="text-2xl font-bold">$0.10</h2>
-                <div class="flex items-center space-x-2">
-                    <span class="text-xs text-white">USD</span>
-                    <label class="relative inline-flex items-center cursor-pointer">
-                        <input type="checkbox" value="" class="sr-only peer">
-                        <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-2 peer-focus:ring-green-300 rounded-full peer peer-checked:bg-green-500"></div>
-                    </label>
-                    <span class="text-xs text-white">KES</span>
-                </div>
-            </div>
-            <div class="grid grid-cols-2 gap-4">
-                <button class="bg-green-700 py-2 rounded-xl text-white font-semibold">Add Cash</button>
-                <button class="bg-green-700 py-2 rounded-xl text-white font-semibold">Withdraw</button>
-            </div>
-        </div>
+  <div class="w-full max-w-sm mx-auto mt-4 p-4 space-y-4">
 
-        <div class="bg-blue-600 rounded-2xl p-4 mb-4">
-            <h3 class="text-lg font-semibold mb-2">You're almost there!</h3>
-            <p class="text-sm mb-3">Get up to $0.25 back on your first add cash transaction. Earn 2% weekly on your savings.</p>
-            <button class="bg-blue-800 w-full py-2 rounded-xl text-white font-semibold">Add Cash</button>
-        </div>
-
-        <div class="bg-gray-800 rounded-2xl p-4">
-            <div class="flex justify-between items-center mb-2">
-                <h3 class="text-lg font-semibold">Recent activity</h3>
-            </div>
-            <div class="space-y-4">
-                <div class="flex justify-between items-center bg-gray-700 p-4 rounded-xl mb-2">
-                    <div class="flex items-center space-x-3">
-                        <div class="bg-blue-500 p-2 rounded-full">📦</div>
-                        <div>
-                            <h4 class="font-medium">Reward</h4>
-                            <span class="text-xs text-gray-400">8 hr ago</span>
-                        </div>
-                    </div>
-                    <span class="text-green-400">+$0.01</span>
-                </div>
-
-                <div class="flex justify-between items-center bg-gray-700 p-4 rounded-xl mb-2">
-                    <div class="flex items-center space-x-3">
-                        <div class="bg-green-500 p-2 rounded-full">🎁</div>
-                        <div>
-                            <h4 class="font-medium">Reward</h4>
-                            <span class="text-xs text-gray-400">8 hr ago</span>
-                        </div>
-                    </div>
-                    <span class="text-green-400">+$0.10</span>
-                </div>
-
-                <div class="flex justify-between items-center bg-gray-700 p-4 rounded-xl mb-2">
-                    <div class="flex items-center space-x-3">
-                        <div class="bg-blue-500 p-2 rounded-full">📦</div>
-                        <div>
-                            <h4 class="font-medium">Reward</h4>
-                            <span class="text-xs text-gray-400">1 day ago</span>
-                        </div>
-                    </div>
-                    <span class="text-green-400">+$0.05</span>
-                </div>
-
-                <div class="flex justify-between items-center bg-gray-700 p-4 rounded-xl mb-2">
-                    <div class="flex items-center space-x-3">
-                        <div class="bg-green-500 p-2 rounded-full">🎁</div>
-                        <div>
-                            <h4 class="font-medium">Reward</h4>
-                            <span class="text-xs text-gray-400">2 days ago</span>
-                        </div>
-                    </div>
-                    <span class="text-green-400">+$0.02</span>
-                </div>
-
-            </div>
-        </div>
+    <!-- Balance Section -->
+    <div class="bg-green-600 rounded-2xl p-4">
+      <div class="flex justify-between items-center mb-2">
+        <h2 class="text-2xl font-bold">$1000.00</h2>
+        <span class="text-xs">USD Account</span>
+      </div>
+      <div class="text-sm text-white space-y-1 mb-3">
+        <p>Equity: $1000</p>
+        <p>Free Margin: $900</p>
+        <p>Used Margin: $100</p>
+        <p>P&L: <span class="text-green-300">+$15.00</span></p>
+      </div>
+      <div class="grid grid-cols-2 gap-4">
+        <button class="bg-green-700 py-2 rounded-xl font-semibold">Deposit</button>
+        <button class="bg-green-700 py-2 rounded-xl font-semibold">Withdraw</button>
+      </div>
     </div>
+
+    <!-- Market Ticker -->
+    <div class="bg-gray-900 rounded-2xl p-4">
+      <h3 class="text-lg font-semibold mb-2">Forex Market</h3>
+      <div class="space-y-2 text-sm">
+        <div class="flex justify-between"><span>EUR/USD</span><span>1.0852</span></div>
+        <div class="flex justify-between"><span>GBP/USD</span><span>1.2754</span></div>
+        <div class="flex justify-between"><span>USD/JPY</span><span>156.24</span></div>
+        <div class="flex justify-between"><span>USD/KES</span><span>139.10</span></div>
+      </div>
+    </div>
+
+    <!-- Chart Placeholder -->
+    <div class="bg-blue-600 rounded-2xl p-4">
+      <h3 class="text-lg font-semibold mb-2">Price Chart</h3>
+      <div class="bg-blue-800 rounded-xl h-40 flex items-center justify-center text-white text-sm">
+        (Chart coming soon)
+      </div>
+    </div>
+
+    <!-- Open Trade Form -->
+    <div class="bg-gray-900 rounded-2xl p-4">
+      <h3 class="text-lg font-semibold mb-2">Open Trade</h3>
+      <form class="space-y-2 text-sm">
+        <select class="w-full p-2 rounded-lg bg-gray-700 text-white">
+          <option>EUR/USD</option>
+          <option>GBP/USD</option>
+          <option>USD/JPY</option>
+        </select>
+        <input type="number" placeholder="Lot Size" class="w-full p-2 rounded-lg bg-gray-700 text-white" />
+        <div class="grid grid-cols-2 gap-2">
+          <button type="button" class="bg-green-600 py-2 rounded-xl font-semibold">Buy</button>
+          <button type="button" class="bg-red-600 py-2 rounded-xl font-semibold">Sell</button>
+        </div>
+      </form>
+    </div>
+
+    <!-- Open Trades Section -->
+    <div class="bg-gray-800 rounded-2xl p-4">
+      <h3 class="text-lg font-semibold mb-2">Open Trades</h3>
+      <div class="space-y-2 text-sm">
+        <div class="bg-gray-700 p-3 rounded-xl flex justify-between items-center">
+          <div>
+            <p>EUR/USD - Buy</p>
+            <p class="text-xs text-gray-400">Lot: 0.1 | P&L: <span class="text-green-400">+2.50</span></p>
+          </div>
+          <button class="bg-red-500 text-white text-xs px-2 py-1 rounded">Close</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Trade History Section -->
+    <div class="bg-gray-800 rounded-2xl p-4">
+      <div class="flex justify-between items-center mb-2">
+        <h3 class="text-lg font-semibold">Trade History</h3>
+      </div>
+      <div class="space-y-4 text-sm">
+        <div class="flex justify-between items-center bg-gray-700 p-4 rounded-xl">
+          <div>
+            <h4 class="font-medium">EUR/USD - Buy</h4>
+            <span class="text-xs text-gray-400">1 day ago</span>
+          </div>
+          <span class="text-green-400">+$5.00</span>
+        </div>
+        <div class="flex justify-between items-center bg-gray-700 p-4 rounded-xl">
+          <div>
+            <h4 class="font-medium">GBP/USD - Sell</h4>
+            <span class="text-xs text-gray-400">2 days ago</span>
+          </div>
+          <span class="text-red-400">-2.00</span>
+        </div>
+      </div>
+    </div>
+
+  </div>
 </body>
 </html>
