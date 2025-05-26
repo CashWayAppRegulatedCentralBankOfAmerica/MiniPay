@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>NovaFX Trade</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    @media (min-width: 768px) {
+      .responsive-container {
+        max-width: 768px;
+        margin: 0 auto;
+      }
+    }
+  </style>
+</head>
+<body class="bg-[#1a1a2e] text-white font-sans antialiased">
+  <div class="w-full px-2 responsive-container mt-4 space-y-4">
+    <!-- Back to Dashboard -->
+    <div>
+      <a href="index.html" class="text-xs bg-blue-500 px-3 py-1 rounded">← Back to Dashboard</a>
+    </div>
+
+    <!-- Market Widget -->
+    <div class="bg-gray-900 rounded-2xl p-2">
+      <iframe src="https://www.tradingview.com/widgetembed/?frameElementId=tradingview_b2a6b&symbol=FX:EURUSD,FX:GBPUSD,FX:USDJPY,FX:USDCHF,FX:AUDUSD,FX:USDCAD,FX:NZDUSD,FX:EURGBP,FX:EURJPY,FX:GBPJPY,FX:XAUUSD&interval=1&theme=dark&style=1&timezone=Etc%2FUTC&withdateranges=1&hide_side_toolbar=false&allow_symbol_change=true&save_image=true&studies=[]" width="100%" height="400" frameborder="0" allowtransparency="true" scrolling="no"></iframe>
+    </div>
+
+    <!-- Trade Form -->
+    <div class="bg-gray-800 rounded-2xl p-4">
+      <h3 class="text-lg font-semibold mb-2">Open Trade</h3>
+      <form id="trade-form" class="space-y-2">
+        <div>
+          <label class="block text-sm">Pair</label>
+          <select id="pair" class="w-full bg-gray-900 p-2 rounded-xl">
+            <option>EURUSD</option>
+            <option>GBPUSD</option>
+            <option>USDJPY</option>
+            <option>USDCHF</option>
+            <option>AUDUSD</option>
+            <option>USDCAD</option>
+            <option>NZDUSD</option>
+            <option>EURGBP</option>
+            <option>EURJPY</option>
+            <option>GBPJPY</option>
+            <option>XAUUSD</option>
+          </select>
+        </div>
+        <div>
+          <label class="block text-sm">Type</label>
+          <select id="type" class="w-full bg-gray-900 p-2 rounded-xl">
+            <option>Buy</option>
+            <option>Sell</option>
+          </select>
+        </div>
+        <div>
+          <label class="block text-sm">Lot Size</label>
+          <input type="number" id="lot" step="0.01" min="0.01" value="0.01" class="w-full bg-gray-900 p-2 rounded-xl" />
+        </div>
+        <button type="submit" class="w-full bg-green-600 py-2 rounded-xl font-semibold">Place Trade</button>
+      </form>
+    </div>
+  </div>
+
+  <script>
+    const tradeForm = document.getElementById("trade-form");
+    tradeForm.onsubmit = function (e) {
+      e.preventDefault();
+      const pair = document.getElementById("pair").value;
+      const type = document.getElementById("type").value;
+      const lot = parseFloat(document.getElementById("lot").value);
+
+      let account = JSON.parse(localStorage.getItem("account")) || {
+        balance: 1000,
+        equity: 1000,
+        usedMargin: 0,
+        pnl: 0,
+        trades: [],
+        history: [],
+      };
+
+      const marginUsed = lot * 100;
+      account.usedMargin += marginUsed;
+      account.trades.push({ pair, type, lot });
+
+      localStorage.setItem("account", JSON.stringify(account));
+      window.location.href = "index.html";
+    };
+  </script>
+</body>
+</html>
