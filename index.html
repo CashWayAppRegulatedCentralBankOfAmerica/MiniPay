@@ -102,5 +102,123 @@
     </div>
 
   </div>
+
+  <!-- Add this script to make the platform live -->
+<script>
+const pairs = ["EUR/USD", "GBP/USD", "USD/JPY", "USD/KES"];
+const prices = {};
+const trades = [];
+let balance = 1000;
+let usedMargin = 100;
+let pnl = 0;
+
+function formatNum(num) {
+  return parseFloat(num).toFixed(4);
+}
+
+async function fetchPrices() {
+  const symbols = {
+    "EUR/USD": "EUR/USD",
+    "GBP/USD": "GBP/USD",
+    "USD/JPY": "USD/JPY",
+    "USD/KES": "USD/KES"
+  };
+
+  const apiKey = "fa443b33e32c49e1b03c0be6d9699b1c";
+  for (const pair in symbols) {
+    const url = `https://api.twelvedata.com/price?symbol=${symbols[pair]}&apikey=${apiKey}`;
+    const res = await fetch(url);
+    const data = await res.json();
+    prices[pair] = parseFloat(data.price);
+  }
+  updatePrices();
+  updateTrades();
+  updateAccount();
+}
+
+function updatePrices() {
+  const marketList = document.querySelectorAll("[data-market]");
+  marketList.forEach(el => {
+    const pair = el.getAttribute("data-market");
+    if (prices[pair]) {
+      el.textContent = formatNum(prices[pair]);
+    }
+  });
+}
+
+function updateTrades() {
+  let openTradeList = document.querySelector("#open-trades");
+  openTradeList.innerHTML = "";
+  pnl = 0;
+
+  trades.forEach((trade, index) => {
+    const currentPrice = prices[trade.pair];
+    if (!currentPrice) return;
+
+    const movement = trade.type === "Buy"
+      ? (currentPrice - trade.entry)
+      : (trade.entry - currentPrice);
+
+    const tradePnl = movement * 100000 * trade.lotSize;
+    pnl += tradePnl;
+
+    const item = document.createElement("div");
+    item.className = "bg-gray-700 p-3 rounded-xl flex justify-between items-center text-sm";
+    item.innerHTML = `
+      <div>
+        <p>${trade.pair} - ${trade.type}</p>
+        <p class="text-xs text-gray-400">Lot: ${trade.lotSize} | P&L: <span class="${tradePnl >= 0 ? 'text-green-400' : 'text-red-400'}">${tradePnl.toFixed(2)}</span></p>
+      </div>
+      <button onclick="closeTrade(${index})" class="bg-red-500 text-white text-xs px-2 py-1 rounded">Close</button>
+    `;
+    openTradeList.appendChild(item);
+  });
+}
+
+function updateAccount() {
+  const equity = balance + pnl;
+  const freeMargin = equity - usedMargin;
+
+  document.querySelector("#balance").textContent = "$" + balance.toFixed(2);
+  document.querySelector("#equity").textContent = "Equity: $" + equity.toFixed(2);
+  document.querySelector("#free-margin").textContent = "Free Margin: $" + freeMargin.toFixed(2);
+  document.querySelector("#used-margin").textContent = "Used Margin: $" + usedMargin.toFixed(2);
+  document.querySelector("#pnl").innerHTML = "P&L: <span class='" + (pnl >= 0 ? "text-green-300" : "text-red-300") + "'>" + pnl.toFixed(2) + "</span>";
+}
+
+function openTrade(type) {
+  const pair = document.querySelector("select").value;
+  const lotSize = parseFloat(document.querySelector("input[type='number']").value) || 0.1;
+  const entry = prices[pair] || 0;
+
+  if (!entry) return alert("Price not loaded yet.");
+
+  trades.push({ pair, type, lotSize, entry });
+  usedMargin += 50;
+  updateTrades();
+  updateAccount();
+}
+
+function closeTrade(index) {
+  trades.splice(index, 1);
+  usedMargin -= 50;
+  updateTrades();
+  updateAccount();
+}
+
+document.querySelector(".bg-green-600 button:nth-child(1)").addEventListener("click", () => {
+  balance += 100;
+  updateAccount();
+});
+
+document.querySelector(".bg-green-600 button:nth-child(2)").addEventListener("click", () => {
+  balance -= 100;
+  updateAccount();
+});
+
+setInterval(fetchPrices, 5000);
+fetchPrices();
+</script>
+
 </body>
 </html>
