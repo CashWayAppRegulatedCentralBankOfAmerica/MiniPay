@@ -45,125 +45,151 @@
   </div>
 
   <script>
-   const pairs = [
-  "EUR/USD", "GBP/USD", "USD/JPY", "USD/KES", "AUD/USD",
-  "USD/CHF", "NZD/USD", "EUR/JPY", "GBP/JPY", "USD/CAD", "XAU/USD"
-];
-let selectedPair = pairs[0];
-let market = {};
+  <script>
+  const pairs = [
+    "EUR/USD", "GBP/USD", "USD/JPY", "USD/KES", "AUD/USD",
+    "USD/CHF", "NZD/USD", "EUR/JPY", "GBP/JPY", "USD/CAD", "XAU/USD"
+  ];
 
-const pairSelect = document.getElementById("pair-select");
-const marketPrices = document.getElementById("market-prices");
-const lotInput = document.getElementById("lot-size");
-const slInput = document.getElementById("stop-loss");
-const tpInput = document.getElementById("take-profit");
+  let selectedPair = pairs[0];
+  let market = {};
+  let userModifiedSL = false;
+  let userModifiedTP = false;
 
-function renderPairs() {
-  pairSelect.innerHTML = pairs.map(p => `<option value="${p}">${p}</option>`).join("");
-}
+  const pairSelect = document.getElementById("pair-select");
+  const marketPrices = document.getElementById("market-prices");
+  const lotInput = document.getElementById("lot-size");
+  const slInput = document.getElementById("stop-loss");
+  const tpInput = document.getElementById("take-profit");
 
-function fetchMarketPrices() {
-  pairs.forEach(pair => {
+  function renderPairs() {
+    pairSelect.innerHTML = pairs.map(p => `<option value="${p}">${p}</option>`).join("");
+  }
+
+  function getPipValue(pair) {
+    if (pair.includes("JPY")) return 0.01;
+    if (pair === "XAU/USD") return 0.1;
+    return 0.0001;
+  }
+
+  function calculateSLTP(price, lot, pair) {
+    const pip = getPipValue(pair);
+    const bufferPips = 10 * lot;
+    const buffer = pip * bufferPips;
+
+    return {
+      sl: (price - buffer).toFixed(5),
+      tp: (price + buffer).toFixed(5)
+    };
+  }
+
+  function fetchMarketPrices() {
+    pairs.forEach(pair => {
+      const symbol = pair.replace("/", "");
+      fetch(`https://api.twelvedata.com/price?symbol=${symbol}&apikey=fa443b33e32c49e1b03c0be6d9699b1c`)
+        .then(res => res.json())
+        .then(data => {
+          if (!data.price) return;
+
+          market[pair] = parseFloat(data.price);
+
+          // Only update SL/TP for current pair if user hasn't modified them manually
+          if (pair === selectedPair && !userModifiedSL && !userModifiedTP) {
+            updateAutoFill();
+          }
+
+          renderMarket();
+        });
+    });
+  }
+
+  function renderMarket() {
+    marketPrices.innerHTML = pairs.map(pair => {
+      const price = market[pair] ? market[pair].toFixed(5) : '...';
+
+      if (pair === selectedPair) {
+        return `<div class="flex justify-between font-bold text-green-400">
+                  <span class="mr-2">${price}</span>
+                  <span>${pair}</span>
+                </div>`;
+      }
+
+      return `<div class="flex justify-between">
+                <span class="mr-2">${price}</span>
+                <span>${pair}</span>
+              </div>`;
+    }).join("");
+  }
+
+  function updateAutoFill() {
+    const price = market[selectedPair];
+    if (!price) return;
+
+    const lot = parseFloat(lotInput.value) || 1;
+    const { sl, tp } = calculateSLTP(price, lot, selectedPair);
+
+    if (!userModifiedSL) slInput.value = sl;
+    if (!userModifiedTP) tpInput.value = tp;
+  }
+
+  function renderChart(pair) {
     const symbol = pair.replace("/", "");
-    fetch(`https://api.twelvedata.com/price?symbol=${symbol}&apikey=fa443b33e32c49e1b03c0be6d9699b1c`)
-      .then(res => res.json())
-      .then(data => {
-        market[pair] = parseFloat(data.price);
-        if (pair === selectedPair) {
-          updateAutoFill();
-        }
-        renderMarket();
-      });
+    document.getElementById("tv-chart").innerHTML = "";
+    new TradingView.widget({
+      autosize: true,
+      symbol: `OANDA:${symbol}`,
+      interval: "1",
+      timezone: "Etc/UTC",
+      theme: "dark",
+      style: "1",
+      locale: "en",
+      container_id: "tv-chart"
+    });
+  }
+
+  function submitTrade(type) {
+    const lot = parseFloat(lotInput.value);
+    const sl = parseFloat(slInput.value);
+    const tp = parseFloat(tpInput.value);
+    const price = market[selectedPair];
+
+    if (!lot || lot < 0.01) return alert("Invalid lot size");
+
+    if (type === 'buy' && (sl >= price || tp <= price)) return alert("Invalid SL/TP for Buy");
+    if (type === 'sell' && (sl <= price || tp >= price)) return alert("Invalid SL/TP for Sell");
+
+    const trades = JSON.parse(localStorage.getItem("trades") || "[]");
+    trades.push({ pair: selectedPair, lot, type, price, sl, tp, opened: Date.now() });
+    localStorage.setItem("trades", JSON.stringify(trades));
+
+    alert(`${type.toUpperCase()} order for ${selectedPair} placed.`);
+  }
+
+  // EVENT LISTENERS
+  pairSelect.addEventListener("change", (e) => {
+    selectedPair = e.target.value;
+    userModifiedSL = false;
+    userModifiedTP = false;
+    updateAutoFill();
+    renderChart(selectedPair);
+    renderMarket();
   });
-}
 
-function renderMarket() {
-  marketPrices.innerHTML = pairs.map(pair => {
-    const price = market[pair] ? market[pair].toFixed(5) : '...';
-    // Indent and highlight selected pair's price on the left side
-    if (pair === selectedPair) {
-      return `<div class='flex justify-between font-bold'>
-                <span class="ml-4">${price}</span>
-                <span>${pair}</span>
-              </div>`;
-    } else {
-      return `<div class='flex justify-between'>
-                <span class="ml-0">${price}</span>
-                <span>${pair}</span>
-              </div>`;
-    }
-  }).join("");
-}
+  lotInput.addEventListener("input", () => {
+    userModifiedSL = false;
+    userModifiedTP = false;
+    updateAutoFill();
+  });
 
-function updateAutoFill() {
-  const price = market[selectedPair];
-  if (!price) return;
+  slInput.addEventListener("input", () => { userModifiedSL = true; });
+  tpInput.addEventListener("input", () => { userModifiedTP = true; });
 
-  // Use lot size for buffer calculation (example: buffer scales with lot size)
-  const lot = parseFloat(lotInput.value) || 1;
-  // Define buffer in pips; e.g., for most pairs 1 pip = 0.0001, for JPY pairs 0.01, for XAU larger
-  const pipValue = getPipValue(selectedPair);
-  const bufferPips = 10 * lot; // 10 pips times lot size, can be adjusted
-
-  const buffer = bufferPips * pipValue;
-
-  // For buy trades: SL below price, TP above price
-  slInput.value = (price - buffer).toFixed(5);
-  tpInput.value = (price + buffer).toFixed(5);
-}
-
-function getPipValue(pair) {
-  // Returns pip size for pair, adjust as needed
-  if (pair.includes("JPY")) return 0.01;
-  if (pair === "XAU/USD") return 0.1; // gold pip size bigger
-  return 0.0001;
-}
-
-// Update SL and TP when lot size changes
-lotInput.addEventListener("input", () => {
-  updateAutoFill();
-});
-
-// Update on pair change
-pairSelect.addEventListener("change", (e) => {
-  selectedPair = e.target.value;
-  updateAutoFill();
+  // INITIALIZE
+  renderPairs();
   renderChart(selectedPair);
-});
-
-function renderChart(pair) {
-  const symbol = pair.replace("/", "");
-  document.getElementById("tv-chart").innerHTML = "";
-  new TradingView.widget({
-    autosize: true,
-    symbol: `OANDA:${symbol}`,
-    interval: "1",
-    timezone: "Etc/UTC",
-    theme: "dark",
-    style: "1",
-    locale: "en",
-    container_id: "tv-chart"
-  });
-}
-
-function submitTrade(type) {
-  const lot = parseFloat(lotInput.value);
-  const sl = parseFloat(slInput.value);
-  const tp = parseFloat(tpInput.value);
-  const price = market[selectedPair];
-  if (!lot || lot < 0.01) return alert("Invalid lot size");
-  if (type === 'buy' && (sl >= price || tp <= price)) return alert("Invalid SL/TP for Buy");
-  if (type === 'sell' && (sl <= price || tp >= price)) return alert("Invalid SL/TP for Sell");
-  const trades = JSON.parse(localStorage.getItem("trades") || "[]");
-  trades.push({ pair: selectedPair, lot, type, price, sl, tp, opened: Date.now() });
-  localStorage.setItem("trades", JSON.stringify(trades));
-  alert(`${type.toUpperCase()} order for ${selectedPair} placed.`);
-}
-
-renderPairs();
-renderChart(selectedPair);
-fetchMarketPrices();
-setInterval(fetchMarketPrices, 3000);
+  fetchMarketPrices();
+  setInterval(fetchMarketPrices, 3000);
+</script>
 
   </script>
 </body>
