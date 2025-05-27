@@ -79,7 +79,7 @@
     </div>
   </div>
 
-  <script>
+ <script>
   const balanceEl = document.getElementById("balance");
   const equityEl = document.getElementById("equity");
   const freeMarginEl = document.getElementById("free-margin");
@@ -136,7 +136,17 @@
         console.error("Error fetching price for", pair);
       }
     }));
+
     renderMarket();
+
+    // Update SL and TP dynamically when market updates and a pair is selected
+    if (pairSelect.value) {
+      const livePrice = parseFloat(market[pairSelect.value]);
+      if (livePrice && !isNaN(livePrice)) {
+        stopLossInput.value = (livePrice * 0.99).toFixed(5);
+        takeProfitInput.value = (livePrice * 1.01).toFixed(5);
+      }
+    }
   }
 
   function renderMarket() {
@@ -150,9 +160,19 @@
   }
 
   pairSelect.addEventListener("change", () => {
-    const price = parseFloat(market[pairSelect.value]);
+    const selectedPair = pairSelect.value;
+    const price = parseFloat(market[selectedPair]);
+
+    if (!price || isNaN(price)) {
+      stopLossInput.value = "";
+      takeProfitInput.value = "";
+      return; // no price yet, don't set anything
+    }
+
+    // Autofill stop loss and take profit near current price
     stopLossInput.value = (price * 0.99).toFixed(5);
     takeProfitInput.value = (price * 1.01).toFixed(5);
+
     updateChart();
   });
 
@@ -269,6 +289,7 @@
     updateMarket();
     updateTrades();
   }, 5000);
-  </script>
+</script>
+
 </body>
 </html>
